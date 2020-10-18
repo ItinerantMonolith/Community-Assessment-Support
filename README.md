@@ -65,6 +65,8 @@ The returned result is json but formatted as an array of data arrays, with the f
 6. ...be able to unselect specific elements of the request (geographic areas, reports) before requesting the reports.
 7. ...be able to see the results of all of the chosen reports from the selected year(s) and geographic area(s).
 
+## Tracking
+### Task tracking will be on a kanban board at Trello: https://trello.com/b/hNTAwNWs
 
 ## Reference Links
 Foundations for Families:  https://foundationsforfamilies.com/
