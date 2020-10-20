@@ -73,7 +73,7 @@ const refreshCounties = async (state) => {
         myCounties.forEach( (e, i) => {
             let newCounty = document.createElement( 'option' )
             newCounty.innerText = e[0].substring(0, e[0].indexOf(','))
-            newCounty.value = parseInt(e[2])
+            newCounty.value = e[2]
             selectCounty.add( newCounty )
         })
     }
@@ -158,23 +158,138 @@ class Report {
         this._name = reportDefinition.name
         this._fields = reportDefinition.fields    // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E' }, {...}, ... ]
         this._isTrend = reportDefinition.isTrend // trend report should have only one field and will be applied to multiple years
+        this._startYear = 0
+        this._endYear = 0
+        this._results = []
+        this._resultCount = 0
+        this._countyFilters = []
+        this._zipFilters = []
+        this._state = document.getElementById( 'selectState' ).value
     }
 
-    setYear = ( year ) => { this._year = year }
-
-    fieldString () {
-        let filter = "NAME"
-        this.fields.forEach ( e => filter += `,${e.code}`)
-        return filter
+    addFilters = ( filters, type ) => {
+        if ( type === 'county' )
+            this._countyFilters = filters  // an array of filter objects, of the form { name: , filterID: , type: [county|zip] }
+        else
+            this._zipFilters = filters
     }
 
-    headers () {
-        let headerList = []
-        this.fields.forEach ( e => headerList.push( e.name ) )
-        return headerList
+    // +== probably don't use this anymore
+    createResultArray = ( row, column ) => {
+        this._results = new Array(row)
+        for (let i=0; i < this._results.length; i++ ) 
+            this._results[i] = new Array(column).fill('')
+        console.log ( this._results )
     }
 
-    get isTrend() { return this._isTrend }
+    headerRow = () => {
+        let header = []
+        header[0] = "Geographic Area"
+        if ( this._isTrend ) 
+            for (let i=0; i < 5; i++ )
+                header.push ( String ( recentYear - ( 4- i ) ) )
+        else
+            this._fields.forEach ( e => header.push ( e.name ) )
+
+        return header
+    }
+
+    processResults = () => {
+        if ( this._resultCount != this._results.length )
+            return
+
+        // All requests processed
+
+        this._results.sort ( (a,b) => {
+            if ( a.type === b.type ) {
+                return a.year < b.year ? -1 : 1
+            }
+            else {  // sort by type
+                return a.type < b.type ? -1 : 1
+            }
+        })
+
+        console.log ( this._results )
+
+    }
+
+
+    requestData = async ( filterType, year ) => {
+        this._resultCount++
+
+        // build the field string portion of the query:  "NAME,BO1003_001E" for instance
+        let fieldString = 'NAME'
+        this._fields.forEach ( e => fieldString += `,${e.code}`)   
+
+        // build the geo filter string
+        let geoString = '&for='
+
+        if ( filterType === 'zstate' ) {
+            geoString = `&for=state:${this._state}`
+        }
+        else {
+            let whichFilters = null
+            let stateString = ''
+        
+            if ( filterType === 'county' ) {
+                geoString += 'county:'
+                // counties must be 3 digits
+                whichFilters = this._countyFilters
+                stateString = `&in=state:${this._state}`
+            }
+            else {      // 'zip'
+                geoString += 'zip%20code%20tabulation%20area:'
+                whichFilters = this._zipFilters
+            }
+            let isFirst = true
+            whichFilters.forEach ( e => {
+                geoString += `${isFirst ? '' : ','}${String(e.filterID)}`
+                isFirst = false
+            })
+            geoString += stateString
+        }
+
+        let myURL = `${BASE_URL}${year}${DATASET}${fieldString}${geoString}${API_KEY}`
+
+        try {
+            let response = await axios.get ( myURL )
+
+            // console.log ( year, response )
+            let respData = response.data
+            respData.shift()    // remove the "header" row
+            // now sort it
+            respData.sort( (a, b) => a[0] < b[0] ? -1 : 1 )
+            this._results.push ( { type: filterType, year: year, data: respData } )
+            this.processResults()
+        }
+        catch ( error ) {
+            // +== add better error handling
+            console.log ( `Error in requestData: ${error}`)
+        }
+    }
+
+    runReports = async () => {
+
+        console.log ('in runReports')
+        // build the url and get the response for each filter and/or year
+        
+        // for each geo filter, we're going to make the call once (for non-trend) or 5 times ( for trend )
+        // NO!  we make one call for counties and one for zips.  so perhaps we should manage those independantly.
+
+        // so now walk the filter types
+        this._results = []
+        for (let fType of ['county', 'zip', 'zstate'] ) {
+            if ( ( fType === 'county' && this._countyFilters.length ) || ( fType === 'zip' && this._zipFilters.length ) || ( fType === 'zstate')) {
+                if ( this._isTrend ) {
+                    for (let i=0; i<5; i++) 
+                        this.requestData ( fType, recentYear - (4 - i) )
+                }
+                else
+                    this.requestData ( fType, document.getElementById ( 'selectYear' ).value )
+            }
+        }
+    }
+
 }
 
 
@@ -252,39 +367,37 @@ const loadReports = () => {
 }
 
 
-const generateReports = (event) => {
+const generateReports = () => {
     // this is where the magic happens!
-    // each report will be executed once for each geo filter.  if it's a trend report, it will be executed once per year per filter.
+    // each report will be executed once for each type of geo filter.  if it's a trend report, it will be executed once per year per filter type.
     
     // +== add a check that we have some geo filters and reports selected..
 
-    // collect the geo filters
-    let myFilters = []
-    if ( !countyList.hasFilters ) {
-        countyList.filterList.forEach ( e => {
-            console.log ( e )
-        })
+    if ( !countyList.hasFilters && !zipList.hasFilters ) {
+        alert ( "Please add one or more Geographic filters.")
+        return
+    }
+    if ( !reportList.hasFilters ) {
+        alert ( "Please select one or more reports" )     // prettify that
+        return
     }
 
     // create an array of report instances
     const reports = []
-    if ( !reportList.hasFilters ) {
-        alert ( "No reports selected" )     // prettify that
-        return
-    }
+
     reportList.filterList.forEach( e => {
         let newReport = new Report ( REPORTS[e.filterID] )
-        if ( !reportTypeTrend ) 
-            newReport.setYear ( document.getElementById ( 'selectYear' ).value )
-        
+        if ( countyList.hasFilters ) 
+            newReport.addFilters ( countyList.filterList, 'county' )
+        if ( zipList.hasFilters )
+            newReport.addFilters ( zipList.filterList, 'zip' )
         reports.push ( newReport )
     })
-
-    
 
     // request each report to go request it's data.
     // When they return are we filling in the reports dynamically, or do we wait for them all?
     //      if dynamic, do we reorder them as they come in?
+    reports.forEach ( e => e.runReports() )
 }
 
 
