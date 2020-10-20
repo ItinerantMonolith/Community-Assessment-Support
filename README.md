@@ -20,7 +20,7 @@ Additional reports may be added over time.
 
 ## U.S. Census Bureau API
 The Census Bureau API is defined by year, dataset, subset, and parameters which include specific field identifiers and geographic filters.
-In this example, we are calling the 2018 ACS5 (5-year estimates) subset of the ACS dataset, and requesting the the field Name and the General Population variable (identified as "B01003_001E") from three counties (#053, #119, and #127) in Florida (state=12).  The request url would be:
+In this example, we are calling the 2018 ACS5 (5-year estimates) subset of the ACS dataset, and requesting the the field Name and the General Population variable (identified as "B01003_001E") from three counties (#053, #119, and #touch127) in Florida (state=12).  The request url would be:
 
 ```
 https://api.census.gov/data/2018/acs/acs5?get=NAME,B01003_001E&for=county:053,119,127&in=state:12

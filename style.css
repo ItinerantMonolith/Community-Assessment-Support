@@ -1,0 +1,84 @@
+body {
+    background-color: bisque;
+    margin: 2vh auto;
+    max-width: 800px;
+}
+
+h1, h3, header {
+    text-align: center;
+}
+
+.divSelect {
+    border-radius: 8px;
+    border: 1px solid black;
+    padding: 2px;
+    margin: 3px;
+    text-align: center;
+}
+
+footer {
+    margin: 50px;
+}
+
+#selectionArea {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+}
+
+#divSelectYear {
+    display: grid;
+    grid-template-rows: 3fr 1fr;
+}
+
+#divSelectGeo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 2fr;
+    grid-column: span 3;
+}
+
+#divGeoHeader {
+    grid-column: span 2;
+    margin: 10px;
+}
+
+#countyList, #zipList { 
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
+#yearList {
+    margin: 5px 20px;
+}
+
+.areaItem {
+    border-radius: 3px;
+    border: 1px dotted blue;
+    margin: 2px;
+    cursor: pointer;
+}
+
+/* #divSelectReports {
+    grid-column: span 2;
+} */
+
+#divGenerateReports {
+    grid-column: span 3;
+    text-align: center;
+}
+
+#btnGenerate {
+    padding: 5px 10px;
+    /* background-color: aqua; */
+    border-radius: 5px;
+    font-size: 20px;
+    color: purple;
+}
+
+.selectedList {
+    margin: 5px auto;
+}
+
+/* #yearMulti {
+    display: none;
+} */
