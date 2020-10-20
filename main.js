@@ -7,14 +7,23 @@ const API_KEY = "&key=00032a8653c1b9fb53c830c4c2537cdb4e637e5f"
 // state codes are fixed. the USCB API is looking for these two character ID's for the states.
 const STATES = [ { name: 'Alabama', id: '01' }, { name: 'Alaska', id: '02' }, { name: 'Arizona', id: '04' }, { name: 'Arkansas', id: '05' }, { name: 'California', id: '06' }, { name: 'Colorado', id: '08' }, { name: 'Connecticut', id: '09' }, { name: 'Delaware', id: '10' }, { name: 'District of Columbia', id: '11' }, { name: 'Florida', id: '12' }, { name: 'Georgia', id: '13' }, { name: 'Idaho', id: '16' }, { name: 'Hawaii', id: '15' }, { name: 'Illinois', id: '17' }, { name: 'Indiana', id: '18' }, { name: 'Iowa', id: '19' }, { name: 'Kansas', id: '20' }, { name: 'Kentucky', id: '21' }, { name: 'Louisiana', id: '22' }, { name: 'Maine', id: '23' }, { name: 'Maryland', id: '24' }, { name: 'Massachusetts', id: '25' }, { name: 'Michigan', id: '26' }, { name: 'Minnesota', id: '27' }, { name: 'Mississippi', id: '28' }, { name: 'Missouri', id: '29' }, { name: 'Montana', id: '30' }, { name: 'Nebraska', id: '31' }, { name: 'Nevada', id: '32' }, { name: 'New Hampshire', id: '33' }, { name: 'New Jersey', id: '34' }, { name: 'New Mexico', id: '35' }, { name: 'New York', id: '36' }, { name: 'North Carolina', id: '37' }, { name: 'North Dakota', id: '38' }, { name: 'Ohio', id: '39' }, { name: 'Oklahoma', id: '40' }, { name: 'Oregon', id: '41' }, { name: 'Pennsylvania', id: '42' }, { name: 'Rhode Island', id: '44' }, { name: 'South Carolina', id: '45' }, { name: 'South Dakota', id: '46' }, { name: 'Tennessee', id: '47' }, { name: 'Texas', id: '48' }, { name: 'Utah', id: '49' }, { name: 'Vermont', id: '50' }, { name: 'Virginia', id: '51' }, { name: 'West Virginia', id: '54' }, { name: 'Washington', id: '53' }, { name: 'Wisconsin', id: '55' }, { name: 'Wyoming', id: '56' }, { name: 'Puerto Rico', id: '72' } ]
 
-const REPORTS = [ { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E' } ], isTrend: true } ]
+const REPORTS = [ 
+    { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E' } ], isTrend: true },
+    { name: 'Median Age and Distribution of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Population (and Percentage of Population) by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Ethnicity as a Percentage of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Language Spoken at Home (5 Years and Over) by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: true },
+    { name: 'Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Poverty Rate by Family Status and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false }
+]
 
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.
-let yearsSelected = []
+let reportTypeTrend = false
 
 const selectCounty = document.getElementById( 'selectCounty' )
 
-const setupYears = async () => {
+const loadYears = async () => {
     // we want to get the 5 most recent available years, so we really just need to find the most recent and take that and the preceding 4.
     // so just do a simple call to get the us population for the years working backwards.
     let lookAgain = true
@@ -42,15 +51,6 @@ const setupYears = async () => {
         newYear.value = recentYear - i
         selectYear.add( newYear )
     }
-
-    document.getElementById ( 'btnYear' ).addEventListener( 'click', () => {
-        yearList.addFilter ( document.getElementById ( 'selectYear' ).value, document.getElementById ( 'selectYear' ).value )
-        // +== refresh the report list here to determine if we have multiple years or not to show trend reports
-    })
-
-    document.getElementById( 'btnCounty' ).addEventListener ( 'click', () => {
-        countyList.addFilter ( selectCounty.options[ selectCounty.selectedIndex ].innerText, selectCounty.value )
-    })
 
     // let's automatically load the counties for our first state.
     // we had to wait here until we knew our recentYear before we can do it
@@ -89,28 +89,29 @@ const refreshCounties = async (state) => {
 
 class FilterList {
     constructor ( itemType, sortAsc = true ) {
-        this.itemType = itemType
-        this.filterList = []
-        this.divList = document.getElementById ( `${this.itemType}List` )
-        this.sortAsc = sortAsc
-        this.updateMultiMsg()
+        this._itemType = itemType
+        this._filterList = []
+        this._divList = document.getElementById ( `${this._itemType}List` )
+        this._sortAsc = sortAsc
     }
 
+    get filterList() { return this._filterList }
+
     clearDisplay () {
-        while ( this.divList.firstChild )
-            this.divList.firstChild.remove()
+        while ( this._divList.firstChild )
+            this._divList.firstChild.remove()
     }
 
     removeItem ( that, value ) {
-        // find the value in my filterList and remove it.
-        that.filterList = that.filterList.filter ( e => e.name != value )
+        // find the value in my _filterList and remove it.
+        that._filterList = that._filterList.filter ( e => e.name != value )
         this.updateDisplay()
     }
 
     updateDisplay ()  {
         this.clearDisplay()
         // clear and refresh the display list for this geo type
-        this.filterList.forEach ( e => {
+        this._filterList.forEach ( e => {
             let newItem = document.createElement( 'div' )
             newItem.innerText = e.name
             newItem.className = 'areaItem'
@@ -119,57 +120,47 @@ class FilterList {
                 let that = this
                 this.removeItem (that, e.target.innerText)
             })
-            this.divList.append( newItem )
+            this._divList.append( newItem )
         })
-        this.updateMultiMsg()
     }
 
     clearList () {
-        this.filterList.length = 0
+        this._filterList.length = 0
         this.updateDisplay()
-        this.updateMultiMsg()
     }
 
     showList () {
         // for debugging only
-        this.filterList.forEach ( e => console.log ( e ) )
-    }
-
-    updateMultiMsg () {
-        const multiMsg = document.getElementById(`${this.itemType}Multi`)
-        if ( multiMsg != null ) {
-            if ( this.filterList.length > 1 )
-                multiMsg.style.display = ''
-            else
-                multiMsg.style.display = 'none'
-        }
+        this._filterList.forEach ( e => console.log ( e ) )
     }
 
     addFilter ( displayText, value ) {
         let newFilter = { name: displayText , filterID: value } 
 
         // use a reduce to see if this value is already in there
-        if ( !this.filterList.reduce( ( isThere, e ) => { return isThere || newFilter.filterID === e.filterID }, false) ) {
-            this.filterList.push ( newFilter )
+        if ( !this._filterList.reduce( ( isThere, e ) => { return isThere || newFilter.filterID === e.filterID }, false) ) {
+            this._filterList.push ( newFilter )
             // sort the list for display
-            if ( this.sortAsc )
-                this.filterList.sort( (a,b) => parseInt(a.filterID) - parseInt(b.filterID) )
+            if ( this._sortAsc )
+                this._filterList.sort( (a,b) => parseInt(a.filterID) - parseInt(b.filterID) )
             else
-                this.filterList.sort( (a,b) => parseInt(b.filterID) - parseInt(a.filterID) )
+                this._filterList.sort( (a,b) => parseInt(b.filterID) - parseInt(a.filterID) )
             this.updateDisplay ()
         }
-  
     }
 
+    get hasFilters () { return this._filterList.length > 0 }
 }
 
 
 class Report {
-    constructor ( name, fields, isTrend ) {
-        this.name = name
-        this.fields = fields    // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E' }, {...}, ... ]
-        this._isTrend = isTrend // trend report should have only one field and will be applied to multiple years
+    constructor ( reportDefinition ) {
+        this._name = reportDefinition.name
+        this._fields = reportDefinition.fields    // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E' }, {...}, ... ]
+        this._isTrend = reportDefinition.isTrend // trend report should have only one field and will be applied to multiple years
     }
+
+    setYear = ( year ) => { this._year = year }
 
     fieldString () {
         let filter = "NAME"
@@ -187,11 +178,9 @@ class Report {
 }
 
 
-const countyList = new FilterList ( 'county' )
-const zipList = new FilterList ( 'zip' )
-const yearList = new FilterList ( 'year', false )
-
 const setupGeoFilters = () => {
+    // load our state list and set up the event listeners & handlers for the county & zip filters
+    
     const selectState = document.getElementById( 'selectState' )
 
     selectState.addEventListener ( 'change', e => refreshCounties( e.target.value ) )
@@ -216,7 +205,100 @@ const setupGeoFilters = () => {
     })
 }
 
-setupGeoFilters()
-setupYears()
+const refreshReportSelection = () => {
+    const reportSelect = document.getElementById( 'selectReport' )
+    reportSelect.length = 0
+    REPORTS.forEach( (e,i) => {
+        if ( e.isTrend === reportTypeTrend ) {
+            let newReport = document.createElement ( 'option' )
+            newReport.innerText = e.name
+            newReport.value = i
+            reportSelect.add ( newReport )
+        }
+    })
+    reportList.clearList()
+}
 
+const loadReports = () => {
+    const reportSelectType = document.getElementById( 'selectReportType' )
+    let newReportType = document.createElement ( 'option' )
+    newReportType.innerText = "Single Year Reports"
+    newReportType.value = false
+    reportSelectType.add ( newReportType )
+
+    newReportType = document.createElement ( 'option' )
+    newReportType.innerText = "Trend (Mulit-Year) Reports"
+    newReportType.value = true
+    reportSelectType.add ( newReportType )
+
+    // we start with single year reports selected.
+    reportTypeTrend = false
+    document.getElementById( 'multiMsg' ).style.display = 'none'
+    refreshReportSelection()
+
+    reportSelectType.addEventListener ( 'change', e => {
+        reportTypeTrend = e.target.value === 'true'         // .value seems to convert to a string
+        document.getElementById( 'divSelectYear' ).style.display = reportTypeTrend ? 'none' : ''
+        document.getElementById( 'multiMsg' ).style.display = reportTypeTrend ? '' : 'none'
+        refreshReportSelection() 
+    })
+
+    const selectReport = document.getElementById( 'selectReport' )
+    // wire the handler for btnReport   +==
+    document.getElementById( 'btnReport' ).addEventListener ( 'click', () => {
+        reportList.addFilter ( selectReport.options[ selectReport.selectedIndex ].innerText, selectReport.value )
+    })
+
+}
+
+
+const generateReports = (event) => {
+    // this is where the magic happens!
+    // each report will be executed once for each geo filter.  if it's a trend report, it will be executed once per year per filter.
+    
+    // +== add a check that we have some geo filters and reports selected..
+
+    // collect the geo filters
+    let myFilters = []
+    if ( !countyList.hasFilters ) {
+        countyList.filterList.forEach ( e => {
+            console.log ( e )
+        })
+    }
+
+    // create an array of report instances
+    const reports = []
+    if ( !reportList.hasFilters ) {
+        alert ( "No reports selected" )     // prettify that
+        return
+    }
+    reportList.filterList.forEach( e => {
+        let newReport = new Report ( REPORTS[e.filterID] )
+        if ( !reportTypeTrend ) 
+            newReport.setYear ( document.getElementById ( 'selectYear' ).value )
+        
+        reports.push ( newReport )
+    })
+
+    
+
+    // request each report to go request it's data.
+    // When they return are we filling in the reports dynamically, or do we wait for them all?
+    //      if dynamic, do we reorder them as they come in?
+}
+
+
+
+const countyList = new FilterList ( 'county' )
+const zipList = new FilterList ( 'zip' )
+const reportList = new FilterList ( 'report' )
+
+window.onload = () => {
+    setupGeoFilters()
+    loadYears()
+    loadReports()
+   
+    // enable the generate button
+    document.getElementById( 'btnGenerate' ).addEventListener( 'click', generateReports )
+}
 

@@ -13,17 +13,38 @@
     </header>
 
     <div id="selectionArea">
-        <div id="divSelectYear" class='divSelect'>
-            <div>
-                <h3>Year Filter</h3>
-                <select id="selectYear"></select>
-                <button id="btnYear">Select Year</button>
-                <div id="yearList" class="selectedList"></div>
+        <div id="divReports" class='divSelect'>
+            <div id="divRepType">
+                <div id="divRepHeader">
+                    <h3>Report Selection</h3>
+                </div>
+                <div>
+                    <label for="selectReportType">Report Type</label>
+                    <select id="selectReportType"></select>
+                </div>
+                <div id="divSelectYear">
+                    <label for="selectYear">Select Year:</label>
+                    <select id="selectYear"></select>
+                </div>
+                <div id="multiMsg">
+                    <span>Trend reports will always pull the most recent 5 years available.</span>
+                    <!-- <div>
+                        <h3>Year Filter</h3>
+                        <select id="selectYear"></select>
+                        <button id="btnYear">Select Year</button>
+                        <div id="yearList" class="selectedList"></div>
+                    </div> -->
+                </div>
             </div>
-            <div id="yearMulti">Multiple years selected: only trend-based reports will be available.</div>
-        </div>
-        <div id="divSelectReports" class='divSelect'>
-            <h3>Report Selection</h3>
+            <div id="divSelectReports">
+                <h3>Reports</h3>
+                <div>
+                    <label for="selectReport">Select Reports</label>
+                    <select id="selectReport"></select>
+                    <button id="btnReport">Add Report</button>
+                    <div id="reportList" class="selectedList"></div>
+                </div>
+            </div>
         </div>
         <div id="divSelectGeo" class="divSelect">
             <div id="divGeoHeader">

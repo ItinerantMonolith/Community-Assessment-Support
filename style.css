@@ -1,11 +1,15 @@
 body {
     background-color: bisque;
-    margin: 2vh auto;
+    margin:  auto;
     max-width: 800px;
 }
 
 h1, h3, header {
     text-align: center;
+}
+
+h3 {
+    margin: 6px;
 }
 
 .divSelect {
@@ -25,11 +29,6 @@ footer {
     grid-template-columns: 1fr 2fr;
 }
 
-#divSelectYear {
-    display: grid;
-    grid-template-rows: 3fr 1fr;
-}
-
 #divSelectGeo {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -37,18 +36,26 @@ footer {
     grid-column: span 3;
 }
 
-#divGeoHeader {
+#divReports {
+    display: grid;
+    /* grid-template-columns: 1fr 1fr; */
+    grid-template-rows: 1fr 2fr;
+    grid-column: span 3;
+}
+
+#divGeoHeader, #divRepHeader  {
     grid-column: span 2;
     margin: 10px;
+}
+
+#divRepType {
+    display: grid;
+    grid-template-column: 1fr 1fr;
 }
 
 #countyList, #zipList { 
     display: grid;
     grid-template-columns: 1fr 1fr;
-}
-
-#yearList {
-    margin: 5px 20px;
 }
 
 .areaItem {
@@ -58,9 +65,6 @@ footer {
     cursor: pointer;
 }
 
-/* #divSelectReports {
-    grid-column: span 2;
-} */
 
 #divGenerateReports {
     grid-column: span 3;
@@ -79,6 +83,6 @@ footer {
     margin: 5px auto;
 }
 
-/* #yearMulti {
-    display: none;
-} */
+#selectReport {
+    max-width: 80%;
+}
