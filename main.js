@@ -9,12 +9,13 @@ const STATES = [ { name: 'Alabama', id: '01' }, { name: 'Alaska', id: '02' }, { 
 
 const REPORTS = [ 
     { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E', type: 'number' } ], isTrend: true },
+    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'BelowPoverty', code: 'B17001_002E,B17001_001E', type: 'percent'} ], isTrend: true },
     { name: 'Median Age and Distribution of the Population by Geographic Area', 
-        fields: [ 
-            { name: 'Median Age', code: 'B01002_001E', type: 'decimal' }, 
-            { name: 'Percent of Population under Age 5', code: 'B01001_003E,B01001_027E,B01001_001E', type: 'percent'},
+    fields: [ 
+        { name: 'Median Age', code: 'B01002_001E', type: 'decimal' }, 
+        { name: 'Percent of Population under Age 5', code: 'B01001_003E,B01001_027E,B01001_001E', type: 'percent'},
             { name: 'Percent of Population under Over Age 65', code: 'B01001_020E,B01001_021E,B01001_022E,B01001_023E,B01001_024E,B01001_025E,B01001_044E,B01001_045E,B01001_046E,B01001_047E,B01001_048E,B01001_049E,B01001_001E', type: 'percent'}
-         ], 
+        ], 
         isTrend: false 
     },
     { name: 'Population (and Percentage of Population) by Race and Geographic Area', 
@@ -39,8 +40,16 @@ const REPORTS = [
         ],
      isTrend: false 
     },
-    { name: 'xxx Language Spoken at Home (5 Years and Over) by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'BelowPoverty', code: 'B17001_002E,B17001_001E', type: 'percent'} ], isTrend: true },
+    { name: 'Language Spoken at Home (5 Years and Over) by Geographic Area',  
+        fields: [ 
+            { name: 'English', code: 'B16007_003E,B16007_009E,B16007_015E,B16007_001E', type: 'percent' },
+            { name: 'Spanish', code: 'B16007_004E,B16007_010E,B16007_016E,B16007_001E', type: 'percent' },
+            { name: 'Other Indo-European', code: 'B16007_005E,B16007_011E,B16007_017E,B16007_001E', type: 'percent' },
+            { name: 'Asian and Pacific Island', code: 'B16007_006E,B16007_012E,B16007_018E,B16007_001E', type: 'percent' },
+            { name: 'Other', code: 'B16007_007E,B16007_013E,B16007_019E,B16007_001E', type: 'percent' },
+        ], 
+        isTrend: false 
+    },
     { name: 'xxx Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
     { name: 'xxx Poverty Rate by Family Status and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false }
 ]
@@ -260,7 +269,6 @@ class Report {
             }
         })
         
-        console.log ( this._results )
         // at this point, _results is sorted by type (county, zip, zState), year (only meaningful for _isTrend), and then the first field of the result, which should be the geo area.
         // if it's an _isTrend, we need to transpose the years into columns.
         // otherwise we basically have the report table.
@@ -344,7 +352,7 @@ class Report {
             })
         }
 
-        console.log ( resultTable )
+        // console.log ( resultTable )
         this.displayResults ( resultTable )
     }
 
