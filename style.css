@@ -89,6 +89,7 @@ footer {
 
 .divTable {
     display: grid;
+    margin: 20px;
 }
 
 .divTableCell {

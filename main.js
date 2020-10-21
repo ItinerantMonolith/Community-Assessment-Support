@@ -8,14 +8,14 @@ const API_KEY = "&key=00032a8653c1b9fb53c830c4c2537cdb4e637e5f"
 const STATES = [ { name: 'Alabama', id: '01' }, { name: 'Alaska', id: '02' }, { name: 'Arizona', id: '04' }, { name: 'Arkansas', id: '05' }, { name: 'California', id: '06' }, { name: 'Colorado', id: '08' }, { name: 'Connecticut', id: '09' }, { name: 'Delaware', id: '10' }, { name: 'District of Columbia', id: '11' }, { name: 'Florida', id: '12' }, { name: 'Georgia', id: '13' }, { name: 'Idaho', id: '16' }, { name: 'Hawaii', id: '15' }, { name: 'Illinois', id: '17' }, { name: 'Indiana', id: '18' }, { name: 'Iowa', id: '19' }, { name: 'Kansas', id: '20' }, { name: 'Kentucky', id: '21' }, { name: 'Louisiana', id: '22' }, { name: 'Maine', id: '23' }, { name: 'Maryland', id: '24' }, { name: 'Massachusetts', id: '25' }, { name: 'Michigan', id: '26' }, { name: 'Minnesota', id: '27' }, { name: 'Mississippi', id: '28' }, { name: 'Missouri', id: '29' }, { name: 'Montana', id: '30' }, { name: 'Nebraska', id: '31' }, { name: 'Nevada', id: '32' }, { name: 'New Hampshire', id: '33' }, { name: 'New Jersey', id: '34' }, { name: 'New Mexico', id: '35' }, { name: 'New York', id: '36' }, { name: 'North Carolina', id: '37' }, { name: 'North Dakota', id: '38' }, { name: 'Ohio', id: '39' }, { name: 'Oklahoma', id: '40' }, { name: 'Oregon', id: '41' }, { name: 'Pennsylvania', id: '42' }, { name: 'Rhode Island', id: '44' }, { name: 'South Carolina', id: '45' }, { name: 'South Dakota', id: '46' }, { name: 'Tennessee', id: '47' }, { name: 'Texas', id: '48' }, { name: 'Utah', id: '49' }, { name: 'Vermont', id: '50' }, { name: 'Virginia', id: '51' }, { name: 'West Virginia', id: '54' }, { name: 'Washington', id: '53' }, { name: 'Wisconsin', id: '55' }, { name: 'Wyoming', id: '56' }, { name: 'Puerto Rico', id: '72' } ]
 
 const REPORTS = [ 
-    { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E' } ], isTrend: true },
-    { name: 'Median Age and Distribution of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Population (and Percentage of Population) by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Ethnicity as a Percentage of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Language Spoken at Home (5 Years and Over) by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'Year', code: 'B17010_001E' } ], isTrend: true },
-    { name: 'Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Poverty Rate by Family Status and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false }
+    { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E', type: 'number' } ], isTrend: true },
+    { name: 'Median Age and Distribution of the Population by Geographic Area',  fields: [ { name: 'Median Age', code: 'B01002_001E', type: 'string' } ], isTrend: false },
+    { name: 'xxx Population (and Percentage of Population) by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'xxx Ethnicity as a Percentage of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'xxx Language Spoken at Home (5 Years and Over) by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'BelowPoverty', code: 'B17001_002E,B17001_001E', type: 'percent'} ], isTrend: true },
+    { name: 'xxx Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'xxx Poverty Rate by Family Status and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false }
 ]
 
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.
@@ -158,8 +158,6 @@ class Report {
         this._name = reportDefinition.name
         this._fields = reportDefinition.fields    // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E' }, {...}, ... ]
         this._isTrend = reportDefinition.isTrend // trend report should have only one field and will be applied to multiple years
-        this._startYear = 0
-        this._endYear = 0
         this._results = []
         this._resultCount = 0
         this._countyFilters = []
@@ -174,22 +172,14 @@ class Report {
             this._zipFilters = filters
     }
 
-    // +== probably don't use this anymore
-    createResultArray = ( row, column ) => {
-        this._results = new Array(row)
-        for (let i=0; i < this._results.length; i++ ) 
-            this._results[i] = new Array(column).fill('')
-        console.log ( this._results )
-    }
-
     headerRow = () => {
         let header = []
-        header[0] = "Geographic Area"
+        header[0] = { value: 'Geographic Area', type: 'string' }
         if ( this._isTrend ) 
             for (let i=0; i < 5; i++ )
-                header.push ( String ( recentYear - ( 4- i ) ) )
+                header.push ( { value: String ( recentYear - ( 4- i ) ), type: 'string' })
         else
-            this._fields.forEach ( e => header.push ( e.name ) )
+            this._fields.forEach ( e => header.push ( { value: e.name, type: 'string' } ) )
 
         return header
     }
@@ -219,10 +209,20 @@ class Report {
                     newDiv.className = 'divTableCell divTableSummary'
                 else
                     newDiv.className = 'divTableCell'
-                if ( index && index2 )
-                    newDiv.innerText = parseInt(e).toLocaleString()
-                else
-                    newDiv.innerText = e
+                // if ( index && index2 ) {
+                    switch ( e.type ) {
+                        case 'number':
+                            newDiv.innerText = parseInt(e.value).toLocaleString()
+                            break
+
+                        case 'percent':
+                            newDiv.innerText = `${e.value}%`
+                            break
+
+                        default:
+                            newDiv.innerText = e.value
+                    }
+                // }
                 tableDiv.appendChild( newDiv )                    
             })
         })
@@ -234,7 +234,7 @@ class Report {
         if ( this._resultCount != this._results.length )
             return
 
-            // All requests processed
+        // All requests processed
 
         this._results.sort ( (a,b) => {
             if ( a.type === b.type ) {
@@ -248,30 +248,61 @@ class Report {
         // at this point, _results is sorted by type (county, zip, zState), year (only meaningful for _isTrend), and then the first field of the result, which should be the geo area.
         // if it's an _isTrend, we need to transpose the years into columns.
         // otherwise we basically have the report table.
+        console.log ( this._results )
+        // if there are data types, we need to clean them up
+        let dataTable = []
+
 
         let resultTable = []
         let offset = 0
-        if ( this._isTrend ) {
+        if ( this._isTrend ) {      // because it's trend data, we have to transpose the years
             let lastType = ''
-            this._results.forEach ( e => {
-                if ( lastType != e.type ) {
+            this._results.forEach ( qry => {
+                if ( lastType != qry.type ) {
                     // first of this type, so lets create new rows
                     offset = resultTable.length
 
-                    e.data.forEach ( e => {
-                        let newArr = [ e[0] ]
+                    qry.data.forEach ( e => {
+                        let newArr = [ { value: e[0], type: 'string' } ]
                         resultTable.push ( newArr )
                     })
 
-                    lastType = e.type
+                    lastType = qry.type
                 }
 
-                e.data.forEach ( (e, index) => {
-                    resultTable[ index + offset ].push ( e[1] )
+                qry.data.forEach ( (e, index) => {
+                    // e is a row (array) of result data.
+                    // tag the results with field types, and we might have a percent to process, which uses two fields
+                    resultTable[ index + offset ].push ( { type: this._fields[0].type, value: this._fields[0].type === 'percent' ? (100*e[1]/e[2]).toFixed(1) : e[1] } )
+                })
+            })
+        }
+        else {
+            // non trend table
+            // for the moment, assume simple data
+            this._results.forEach ( qry => {
+                // e is a query result.  e.data is an array of arrays
+                qry.data.forEach ( e => {
+                    // in this case, lets walk them using the fields. 
+                    // first value will be the geo name
+                    let newArr = [ { value: e[0], type: 'string'} ]
+                    let fieldOffset = 0
+                    this._fields.forEach ( field => {
+                        fieldOffset++
+                        // deal with percentage here.
+                        if ( field.type === 'percent' ) {
+                            newArr.push( { type: 'percent', value: (100 * e[fieldOffset] / e[fieldOffset + 1 ]).toFixed(1) } )
+                            fieldOffset++
+                        }
+                        else 
+                            newArr.push( { type: field.type, value: e[fieldOffset] } )
+                    })
+                    resultTable.push ( newArr )
                 })
             })
         }
 
+        console.log ( resultTable )
         this.displayResults ( resultTable )
     }
 
@@ -323,7 +354,7 @@ class Report {
             // if we did counties, we need to scrub the name which will be "Fairfax County, Virginia" to remove the state
             if ( filterType === 'county' ) 
                 respData.forEach ( (e,index) => respData[index][0] = e[0].substring(0, e[0].indexOf(',')) )
-
+            
             this._results.push ( { type: filterType, year: year, data: respData } )
             this.processResults()
         }
