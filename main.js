@@ -10,11 +10,50 @@ const STATES = [ { name: 'Alabama', id: '01' }, { name: 'Alaska', id: '02' }, { 
 const REPORTS = [ 
     { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E', type: 'number' } ], isTrend: true },
     { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'BelowPoverty', code: 'B17001_002E,B17001_001E', type: 'percent'} ], isTrend: true },
+    { name: 'Ethnicity as a Percentage of the Population by Geographic Area',  
+        fields: [ 
+            { name: 'Hispanic or Latio Origin (of any race)', code: 'B03001_003E,B03001_001E', type: 'percent' },
+            { name: 'Hispanic or Latio Origin: Mexican', code: 'B03001_004E,B03001_001E', type: 'percent' },
+            { name: 'Hispanic or Latio Origin: Puerto Rican', code: 'B03001_005E,B03001_001E', type: 'percent' },
+            { name: 'Hispanic or Latio Origin: Cuban', code: 'B03001_006E,B03001_001E', type: 'percent' },  
+            { name: 'Hispanic or Latio Origin: Other', code: 'B03001_007E,B03001_008E,B03001_016E,B03001_027E,B03001_001E', type: 'percent' }  
+        ],
+        isTrend: false 
+    },
+    { name: 'Foreign-Born Population by Geographic Area',  
+        fields: [ 
+            { name: 'Percent Foreign-Born', code: 'B05002_013E,B05002_001E', type: 'sumPct' },
+            { name: 'Percent of Foreign-Born Population that is a non-US Citizen', code: 'B05002_021E,B05002_013E', type: 'sumPct' }
+        ],
+        isTrend: false 
+    },
+    { name: 'Language Spoken at Home (5 Years and Over) by Geographic Area',  
+        fields: [ 
+            { name: 'English', code: 'B16007_003E,B16007_009E,B16007_015E,B16007_001E', type: 'percent' },
+            { name: 'Spanish', code: 'B16007_004E,B16007_010E,B16007_016E,B16007_001E', type: 'percent' },
+            { name: 'Other Indo-European', code: 'B16007_005E,B16007_011E,B16007_017E,B16007_001E', type: 'percent' },
+            { name: 'Asian and Pacific Island', code: 'B16007_006E,B16007_012E,B16007_018E,B16007_001E', type: 'percent' },
+            { name: 'Other', code: 'B16007_007E,B16007_013E,B16007_019E,B16007_001E', type: 'percent' },
+        ], 
+        isTrend: false 
+    },
     { name: 'Median Age and Distribution of the Population by Geographic Area', 
-    fields: [ 
-        { name: 'Median Age', code: 'B01002_001E', type: 'decimal' }, 
-        { name: 'Percent of Population under Age 5', code: 'B01001_003E,B01001_027E,B01001_001E', type: 'percent'},
-            { name: 'Percent of Population under Over Age 65', code: 'B01001_020E,B01001_021E,B01001_022E,B01001_023E,B01001_024E,B01001_025E,B01001_044E,B01001_045E,B01001_046E,B01001_047E,B01001_048E,B01001_049E,B01001_001E', type: 'percent'}
+        fields: [ 
+            { name: 'Median Age', code: 'B01002_001E', type: 'decimal' }, 
+            { name: 'Percent of Population under Age 5', code: 'B01001_003E,B01001_027E,B01001_001E', type: 'percent'},
+                { name: 'Percent of Population under Over Age 65', code: 'B01001_020E,B01001_021E,B01001_022E,B01001_023E,B01001_024E,B01001_025E,B01001_044E,B01001_045E,B01001_046E,B01001_047E,B01001_048E,B01001_049E,B01001_001E', type: 'percent'}
+            ], 
+            isTrend: false 
+    },
+    { name: 'Number (and Percent) of Individuals Below Poverty Level by Race and Geographic Area',  
+        fields: [ 
+            { name: 'White', code: 'B17001A_002E,B17001A_001E', type: 'sumPct' },
+            { name: 'Black or African American', code: 'B17001B_002E,B17001B_001E', type: 'sumPct' },
+            { name: 'American Indian & Alaskan Native', code: 'B17001C_002E,B17001C_001E', type: 'sumPct' },
+            { name: 'Asian', code: 'B17001D_002E,B17001D_001E', type: 'sumPct' },
+            { name: 'Native Hawaiian or Other Pacific Islander', code: 'B17001E_002E,B17001E_001E', type: 'sumPct' },
+            { name: 'Some other race', code: 'B17001F_002E,B17001F_001E', type: 'sumPct' },
+            { name: 'Two or more races', code: 'B17001G_002E,B17001G_001E', type: 'sumPct' }
         ], 
         isTrend: false 
     },
@@ -29,29 +68,7 @@ const REPORTS = [
             { name: 'Two or more races (percent)', code: 'B02001_008E,B02001_001E', type: 'sumPct'}, 
         ], 
         isTrend: false 
-    },
-    { name: 'Ethnicity as a Percentage of the Population by Geographic Area',  
-        fields: [ 
-            { name: 'Hispanic or Latio Origin (of any race)', code: 'B03001_003E,B03001_001E', type: 'percent' },
-            { name: 'Hispanic or Latio Origin: Mexican', code: 'B03001_004E,B03001_001E', type: 'percent' },
-            { name: 'Hispanic or Latio Origin: Puerto Rican', code: 'B03001_005E,B03001_001E', type: 'percent' },
-            { name: 'Hispanic or Latio Origin: Cuban', code: 'B03001_006E,B03001_001E', type: 'percent' },  
-            { name: 'Hispanic or Latio Origin: Other', code: 'B03001_007E,B03001_008E,B03001_016E,B03001_027E,B03001_001E', type: 'percent' }  
-        ],
-     isTrend: false 
-    },
-    { name: 'Language Spoken at Home (5 Years and Over) by Geographic Area',  
-        fields: [ 
-            { name: 'English', code: 'B16007_003E,B16007_009E,B16007_015E,B16007_001E', type: 'percent' },
-            { name: 'Spanish', code: 'B16007_004E,B16007_010E,B16007_016E,B16007_001E', type: 'percent' },
-            { name: 'Other Indo-European', code: 'B16007_005E,B16007_011E,B16007_017E,B16007_001E', type: 'percent' },
-            { name: 'Asian and Pacific Island', code: 'B16007_006E,B16007_012E,B16007_018E,B16007_001E', type: 'percent' },
-            { name: 'Other', code: 'B16007_007E,B16007_013E,B16007_019E,B16007_001E', type: 'percent' },
-        ], 
-        isTrend: false 
-    },
-    { name: 'xxx Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'xxx Poverty Rate by Family Status and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false }
+    }
 ]
 
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.

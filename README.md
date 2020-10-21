@@ -15,7 +15,7 @@ FFF routinely generates more than 20 reports from U.S. Census Bureau data to inc
 * Language Spoken at Home (5 Years and Over) by Geographic Area
 * Poverty Rate by Geographic Area and Year
 * Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area
-* Poverty Rate by Family Status and Geographic Area 
+* Foreign-Born Population by Geographic Area
 Additional reports may be added over time.
 
 ## U.S. Census Bureau API
