@@ -9,9 +9,36 @@ const STATES = [ { name: 'Alabama', id: '01' }, { name: 'Alaska', id: '02' }, { 
 
 const REPORTS = [ 
     { name: 'Population by Geographic Area and Year', fields: [ { name: 'Year', code: 'B01003_001E', type: 'number' } ], isTrend: true },
-    { name: 'Median Age and Distribution of the Population by Geographic Area',  fields: [ { name: 'Median Age', code: 'B01002_001E', type: 'string' } ], isTrend: false },
-    { name: 'xxx Population (and Percentage of Population) by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'xxx Ethnicity as a Percentage of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
+    { name: 'Median Age and Distribution of the Population by Geographic Area', 
+        fields: [ 
+            { name: 'Median Age', code: 'B01002_001E', type: 'decimal' }, 
+            { name: 'Percent of Population under Age 5', code: 'B01001_003E,B01001_027E,B01001_001E', type: 'percent'},
+            { name: 'Percent of Population under Over Age 65', code: 'B01001_020E,B01001_021E,B01001_022E,B01001_023E,B01001_024E,B01001_025E,B01001_044E,B01001_045E,B01001_046E,B01001_047E,B01001_048E,B01001_049E,B01001_001E', type: 'percent'}
+         ], 
+        isTrend: false 
+    },
+    { name: 'Population (and Percentage of Population) by Race and Geographic Area', 
+        fields: [ 
+            { name: 'White (percent)', code: 'B02001_002E,B02001_001E', type: 'sumPct'},
+            { name: 'Black or African American (percent)', code: 'B02001_003E,B02001_001E', type: 'sumPct'},
+            { name: 'American Indian and Alaskan Native (percent)', code: 'B02001_004E,B02001_001E', type: 'sumPct'},
+            { name: 'Asian (percent)', code: 'B02001_005E,B02001_001E', type: 'sumPct'},
+            { name: 'Native Hawaiian & Other Pacific Islander (percent)', code: 'B02001_006E,B02001_001E', type: 'sumPct'},
+            { name: 'Some other race (percent)', code: 'B02001_007E,B02001_001E', type: 'sumPct'},
+            { name: 'Two or more races (percent)', code: 'B02001_008E,B02001_001E', type: 'sumPct'}, 
+        ], 
+        isTrend: false 
+    },
+    { name: 'Ethnicity as a Percentage of the Population by Geographic Area',  
+        fields: [ 
+            { name: 'Hispanic or Latio Origin (of any race)', code: 'B03001_003E,B03001_001E', type: 'percent' },
+            { name: 'Hispanic or Latio Origin: Mexican', code: 'B03001_004E,B03001_001E', type: 'percent' },
+            { name: 'Hispanic or Latio Origin: Puerto Rican', code: 'B03001_005E,B03001_001E', type: 'percent' },
+            { name: 'Hispanic or Latio Origin: Cuban', code: 'B03001_006E,B03001_001E', type: 'percent' },  
+            { name: 'Hispanic or Latio Origin: Other', code: 'B03001_007E,B03001_008E,B03001_016E,B03001_027E,B03001_001E', type: 'percent' }  
+        ],
+     isTrend: false 
+    },
     { name: 'xxx Language Spoken at Home (5 Years and Over) by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
     { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'BelowPoverty', code: 'B17001_002E,B17001_001E', type: 'percent'} ], isTrend: true },
     { name: 'xxx Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
@@ -173,13 +200,12 @@ class Report {
     }
 
     headerRow = () => {
-        let header = []
-        header[0] = { value: 'Geographic Area', type: 'string' }
+        let header = [ 'Geographic Area' ]
         if ( this._isTrend ) 
             for (let i=0; i < 5; i++ )
-                header.push ( { value: String ( recentYear - ( 4- i ) ), type: 'string' })
+                header.push ( String ( recentYear - ( 4- i ) ) )
         else
-            this._fields.forEach ( e => header.push ( { value: e.name, type: 'string' } ) )
+            this._fields.forEach ( e => header.push ( e.name ) )
 
         return header
     }
@@ -201,7 +227,7 @@ class Report {
 
         // put the data in the table
         results.forEach ( (resRow, index) => {
-            resRow.forEach ( (e, index2) => {
+            resRow.forEach ( e => {
                 let newDiv = document.createElement( 'div' )
                 if ( index === 0 )
                     newDiv.className = 'divTableCell divTableHeader'
@@ -209,20 +235,9 @@ class Report {
                     newDiv.className = 'divTableCell divTableSummary'
                 else
                     newDiv.className = 'divTableCell'
-                // if ( index && index2 ) {
-                    switch ( e.type ) {
-                        case 'number':
-                            newDiv.innerText = parseInt(e.value).toLocaleString()
-                            break
+                
+                newDiv.innerText = e
 
-                        case 'percent':
-                            newDiv.innerText = `${e.value}%`
-                            break
-
-                        default:
-                            newDiv.innerText = e.value
-                    }
-                // }
                 tableDiv.appendChild( newDiv )                    
             })
         })
@@ -244,14 +259,11 @@ class Report {
                 return a.type < b.type ? -1 : 1
             }
         })
-
+        
+        console.log ( this._results )
         // at this point, _results is sorted by type (county, zip, zState), year (only meaningful for _isTrend), and then the first field of the result, which should be the geo area.
         // if it's an _isTrend, we need to transpose the years into columns.
         // otherwise we basically have the report table.
-        console.log ( this._results )
-        // if there are data types, we need to clean them up
-        let dataTable = []
-
 
         let resultTable = []
         let offset = 0
@@ -263,7 +275,7 @@ class Report {
                     offset = resultTable.length
 
                     qry.data.forEach ( e => {
-                        let newArr = [ { value: e[0], type: 'string' } ]
+                        let newArr = [ e[0] ]
                         resultTable.push ( newArr )
                     })
 
@@ -273,7 +285,7 @@ class Report {
                 qry.data.forEach ( (e, index) => {
                     // e is a row (array) of result data.
                     // tag the results with field types, and we might have a percent to process, which uses two fields
-                    resultTable[ index + offset ].push ( { type: this._fields[0].type, value: this._fields[0].type === 'percent' ? (100*e[1]/e[2]).toFixed(1) : e[1] } )
+                    resultTable[ index + offset ].push ( this._fields[0].type === 'percent' ? `${(100*e[1]/e[2]).toFixed(1)}%` :  parseInt( e[1] ).toLocaleString()  )
                 })
             })
         }
@@ -285,17 +297,47 @@ class Report {
                 qry.data.forEach ( e => {
                     // in this case, lets walk them using the fields. 
                     // first value will be the geo name
-                    let newArr = [ { value: e[0], type: 'string'} ]
+                    let newArr = [ e[0] ]
                     let fieldOffset = 0
                     this._fields.forEach ( field => {
                         fieldOffset++
                         // deal with percentage here.
-                        if ( field.type === 'percent' ) {
-                            newArr.push( { type: 'percent', value: (100 * e[fieldOffset] / e[fieldOffset + 1 ]).toFixed(1) } )
-                            fieldOffset++
+                        if ( ( field.type === 'percent' ) || ( field.type === 'sumPct' ) ) {
+                            // newArr.push( { type: 'percent', value: (100 * e[fieldOffset] / e[fieldOffset + 1 ]).toFixed(1) } )
+                            // fieldOffset++
+                            // in this case this._fields.code will have multiple comma separated entries, the last is the divisor, all others should be totaled for the numerator
+                            let sum = 0
+                            let fieldCount = field.code.split(',').length - 1
+                            while ( fieldCount ) {
+                                sum += parseInt(e[fieldOffset])
+                                fieldOffset++
+                                fieldCount--
+                            }
+                            let sumPct = (100 * sum / e[fieldOffset]).toFixed(1)
+                            if ( field.type === 'percent' )
+                                newArr.push( `${sumPct}%` )
+                            else {
+                                newArr.push( `${parseInt( sum ).toLocaleString()} (${sumPct}%)` )
+                            }
                         }
+                        else if ( field.type === 'sum' ) {
+                            // in this case this._fields.code will have multiple comma separated entries.
+                            let sum = 0
+                            let fieldCount = field.code.split(',').length
+                            while ( fieldCount ) {
+                                sum += parseInt(e[fieldOffset])
+                                fieldOffset++
+                                fieldCount--
+                            }
+                            fieldOffset--       // we incremented by as many as we used, but we want the counter to end on the last element we used.
+                            newArr.push(  parseInt( sum ).toLocaleString() )
+                        }
+                        else if ( field.type === 'number' )
+                            newArr.push(  parseInt( e[fieldOffset] ).toLocaleString() )
+                        else if ( field.type === 'decimal' )
+                            newArr.push(  parseFloat( e[fieldOffset] ).toFixed(1).toLocaleString() )
                         else 
-                            newArr.push( { type: field.type, value: e[fieldOffset] } )
+                            newArr.push( e[fieldOffset] )
                     })
                     resultTable.push ( newArr )
                 })
