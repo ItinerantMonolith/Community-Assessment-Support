@@ -13,7 +13,7 @@ const REPORTS = [
     { name: 'Population (and Percentage of Population) by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
     { name: 'Ethnicity as a Percentage of the Population by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
     { name: 'Language Spoken at Home (5 Years and Over) by Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
-    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: true },
+    { name: 'Poverty Rate by Geographic Area and Year',  fields: [ { name: 'Year', code: 'B17010_001E' } ], isTrend: true },
     { name: 'Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false },
     { name: 'Poverty Rate by Family Status and Geographic Area',  fields: [ { name: 'Placeholder', code: 'B01003_001E' } ], isTrend: false }
 ]
@@ -194,11 +194,47 @@ class Report {
         return header
     }
 
+    displayResults ( results ) {
+        // build the header row and stick it in front
+        results.unshift ( this.headerRow () )
+
+        let tableDiv = document.createElement( 'div' )
+
+        tableDiv.className = 'divTable'
+        tableDiv.style.gridTemplateColumns = '1fr '.repeat( results[0].length );
+        // give the report a title
+        let newTitle = document.createElement ( 'div' )
+        newTitle.className = 'divTableTitle'
+        newTitle.innerText = this._name
+        newTitle.style.gridColumn = `span ${results[0].length}`
+        tableDiv.appendChild( newTitle )
+
+        // put the data in the table
+        results.forEach ( (resRow, index) => {
+            resRow.forEach ( (e, index2) => {
+                let newDiv = document.createElement( 'div' )
+                if ( index === 0 )
+                    newDiv.className = 'divTableCell divTableHeader'
+                else if ( index === results.length - 1 )
+                    newDiv.className = 'divTableCell divTableSummary'
+                else
+                    newDiv.className = 'divTableCell'
+                if ( index && index2 )
+                    newDiv.innerText = parseInt(e).toLocaleString()
+                else
+                    newDiv.innerText = e
+                tableDiv.appendChild( newDiv )                    
+            })
+        })
+
+        document.querySelector ( 'body' ).append( tableDiv )
+    }
+
     processResults = () => {
         if ( this._resultCount != this._results.length )
             return
 
-        // All requests processed
+            // All requests processed
 
         this._results.sort ( (a,b) => {
             if ( a.type === b.type ) {
@@ -209,8 +245,34 @@ class Report {
             }
         })
 
-        console.log ( this._results )
+        // at this point, _results is sorted by type (county, zip, zState), year (only meaningful for _isTrend), and then the first field of the result, which should be the geo area.
+        // if it's an _isTrend, we need to transpose the years into columns.
+        // otherwise we basically have the report table.
 
+        let resultTable = []
+        let offset = 0
+        if ( this._isTrend ) {
+            let lastType = ''
+            this._results.forEach ( e => {
+                if ( lastType != e.type ) {
+                    // first of this type, so lets create new rows
+                    offset = resultTable.length
+
+                    e.data.forEach ( e => {
+                        let newArr = [ e[0] ]
+                        resultTable.push ( newArr )
+                    })
+
+                    lastType = e.type
+                }
+
+                e.data.forEach ( (e, index) => {
+                    resultTable[ index + offset ].push ( e[1] )
+                })
+            })
+        }
+
+        this.displayResults ( resultTable )
     }
 
 
@@ -253,12 +315,15 @@ class Report {
 
         try {
             let response = await axios.get ( myURL )
-
             // console.log ( year, response )
             let respData = response.data
             respData.shift()    // remove the "header" row
             // now sort it
             respData.sort( (a, b) => a[0] < b[0] ? -1 : 1 )
+            // if we did counties, we need to scrub the name which will be "Fairfax County, Virginia" to remove the state
+            if ( filterType === 'county' ) 
+                respData.forEach ( (e,index) => respData[index][0] = e[0].substring(0, e[0].indexOf(',')) )
+
             this._results.push ( { type: filterType, year: year, data: respData } )
             this.processResults()
         }
@@ -268,20 +333,18 @@ class Report {
         }
     }
 
-    runReports = async () => {
-
-        console.log ('in runReports')
-        // build the url and get the response for each filter and/or year
-        
-        // for each geo filter, we're going to make the call once (for non-trend) or 5 times ( for trend )
-        // NO!  we make one call for counties and one for zips.  so perhaps we should manage those independantly.
+    runReports = () => {
+        // for each geo filter type (county/zip), we're going to make the call once (for non-trend) or 5 times ( for trend )
+        // additionally, we create a summary row for the state as a third type
 
         // so now walk the filter types
         this._results = []
+        this._resultCount = 0
+
         for (let fType of ['county', 'zip', 'zstate'] ) {
             if ( ( fType === 'county' && this._countyFilters.length ) || ( fType === 'zip' && this._zipFilters.length ) || ( fType === 'zstate')) {
                 if ( this._isTrend ) {
-                    for (let i=0; i<5; i++) 
+                    for (let i=0; i<5; i++)
                         this.requestData ( fType, recentYear - (4 - i) )
                 }
                 else

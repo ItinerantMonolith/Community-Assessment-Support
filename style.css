@@ -86,3 +86,26 @@ footer {
 #selectReport {
     max-width: 80%;
 }
+
+.divTable {
+    display: grid;
+}
+
+.divTableCell {
+    border: 1px solid black;
+    padding: 2px 4px;
+}
+
+.divTableTitle {
+    text-align: left;
+    font-size: 1.5em;
+}
+
+.divTableHeader {
+    font-weight: bold;
+    background-color: lightgray;
+}
+
+.divTableSummary {
+    background-color: yellow;
+}
