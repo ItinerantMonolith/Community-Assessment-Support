@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
+    <title>Community Assessment Report Details</title>
+</head>
+<body>
+    <h1>Community Assessment Report Details</h1>
+    <header>
+        <h3>This page will explain the details of the underlying data for each of the reports used for the Community Assessements.</h3>
+        For more details on the source of the data and understanding data codes, <br>refer to 
+        <a href="https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020_ch02.pdf" target="_blank">Working with the Census Data API</a>
+    </header>
+    
+    <main>
+        <div id="divReports" class='divSelect'>
+            <h4>View Report Details</h4>
+            <select id="selectReport"></select>
+        </div>
+    </main>
+
+    <footer><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="staticReport.js"></script>
+    <script src="reportDetails.js"></script>
+</body>
+</html>

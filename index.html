@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <title>Community Assessment Report Tool</title>
 </head>
 <body>
@@ -11,66 +12,62 @@
     <header>
         <h3>This tool will allow you to select reports to be generated based on the Census Bureau's American Community Survey data for selected years.  It will be accessing the 5-year estimate (ACS5) data unless otherwise determined.</h3> 
     </header>
-
-    <div id="selectionArea">
-        <div id="divReports" class='divSelect'>
-            <div id="divRepType">
-                <div id="divRepHeader">
-                    <h3>Report Selection</h3>
-                </div>
-                <div>
-                    <label for="selectReportType">Report Type</label>
-                    <select id="selectReportType"></select>
-                </div>
-                <div id="divSelectYear">
-                    <label for="selectYear">Select Year:</label>
-                    <select id="selectYear"></select>
-                </div>
-                <div id="multiMsg">
-                    <span>Trend reports will always pull the most recent 5 years available.</span>
-                    <!-- <div>
-                        <h3>Year Filter</h3>
+    <main>
+        <div id="selectionArea">
+            <div id="divReports" class='divSelect'>
+                <div id="divRepType">
+                    <div id="divRepHeader">
+                        <h3>Report Selection</h3>
+                    </div>
+                    <div>
+                        <label for="selectReportType">Report Type</label>
+                        <select id="selectReportType"></select>
+                    </div>
+                    <div id="divSelectYear">
+                        <label for="selectYear">Select Year:</label>
                         <select id="selectYear"></select>
-                        <button id="btnYear">Select Year</button>
-                        <div id="yearList" class="selectedList"></div>
-                    </div> -->
+                    </div>
+                    <div id="multiMsg">
+                        <span>Trend reports will always pull the most recent 5 years available.</span>
+                    </div>
+                </div>
+                <div id="divSelectReports">
+                    <h3>Reports</h3>
+                    <div>
+                        <label for="selectReport">Select Reports</label>
+                        <select id="selectReport"></select>
+                        <button id="btnReport">Add Report</button>
+                        <div id="reportList" class="selectedList"></div>
+                    </div>
                 </div>
             </div>
-            <div id="divSelectReports">
-                <h3>Reports</h3>
+            <div id="divSelectGeo" class="divSelect">
+                <div id="divGeoHeader">
+                    <h3>Geographic Filter</h3>
+                    <select id="selectState"></select>
+                </div>
                 <div>
-                    <label for="selectReport">Select Reports</label>
-                    <select id="selectReport"></select>
-                    <button id="btnReport">Add Report</button>
-                    <div id="reportList" class="selectedList"></div>
+                    <label for="selectCounty">Select County</label>
+                    <select id="selectCounty"></select>
+                    <button id="btnCounty">Add County</button>
+                    <div id="countyList" class="selectedList"></div>
+                </div>
+                <div>
+                    <label for="textZip">Enter Zip Code</label><input type="text" id="textZip">
+                    <button id="btnZip">Add Zip</button>
+                    <div id="zipList" class="selectedList"></div>
                 </div>
             </div>
-        </div>
-        <div id="divSelectGeo" class="divSelect">
-            <div id="divGeoHeader">
-                <h3>Geographic Filter</h3>
-                <select id="selectState"></select>
+            <div id="divGenerateReports">
+                <button id="btnGenerate">Generate Reports</button><button id="btnClear">Clear Reports</button>
             </div>
-            <div>
-                <label for="selectCounty">Select County</label>
-                <select id="selectCounty"></select>
-                <button id="btnCounty">Add County</button>
-                <div id="countyList" class="selectedList"></div>
-            </div>
-            <div>
-                <label for="textZip">Enter Zip Code</label><input type="text" id="textZip">
-                <button id="btnZip">Add Zip</button>
-                <div id="zipList" class="selectedList"></div>
-            </div>
-        </div>
-        <div id="divGenerateReports">
-            <button id="btnGenerate">Generate Reports</button>
-        </div>
 
-    </div>
+        </div>
+    </main>
     <footer><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="staticReport.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
