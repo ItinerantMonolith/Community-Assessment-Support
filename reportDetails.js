@@ -6,18 +6,6 @@ const clearReportDetails = () => {
         mainReport.remove()
 }
 
-const addDiv = ( parent, text, className ) => {
-    const newDiv = document.createElement( 'div' )
-    if ( text )
-        newDiv.innerText = text
-    if ( className )
-        newDiv.className = className
-
-    parent.appendChild ( newDiv )
-}
-
-const addLabel = ( parent, text ) => addDiv ( parent, text, 'reportLabel' )
-
 const typeDisplay = { 
     number: 'Number',
     percent: 'Percent:  all but last data elements are added together and divided by the final element',
@@ -69,6 +57,42 @@ const displayReportDetails = () => {
 }
 
 
+const displayReport = () => {
+    const report = REPORTS[ document.getElementById( 'selectReport' ).value ]
+
+    let tableDiv = document.createElement( 'div' )
+    tableDiv.className = 'divTable'
+    tableDiv.style.gridTemplateColumns = '1fr '.repeat( report.fields.length + 1 );
+
+    // give the report a title
+    let newTitle = document.createElement ( 'div' )
+    newTitle.className = 'divTableTitle'
+    newTitle.innerText = report.name
+    newTitle.style.gridColumn = `span ${report.fields.length + 1}`
+    tableDiv.appendChild( newTitle )
+
+    let newType = document.createElement ( 'div' )
+    newType.innerHTML = `<em>${report.isTrend ? 'Trend Report (most recent 5 years)' : 'Single Year Report'}</em>`
+    newType.style.gridColumn =  `span ${report.fields.length + 1}`
+    tableDiv.appendChild( newType )
+
+    let newCell = document.createElement( 'div' )
+    newCell.innerText = 'Geographic Area'
+    newCell.className = 'divTableCell divTableHeader divTableFirst'
+    tableDiv.appendChild( newCell )
+    report.fields.forEach ( e => {
+        let newCell = document.createElement( 'div' )
+        newCell.innerHTML = e.name
+        newCell.className = 'divTableCell divTableHeader'
+        tableDiv.appendChild( newCell )
+    })
+    
+
+    document.querySelector( '#reportDisplay' ).appendChild( tableDiv )
+}
+
+
+
 const refreshReportSelection = () => {
     const reportSelect = document.getElementById( 'selectReport' )
     reportSelect.length = 0
@@ -79,7 +103,8 @@ const refreshReportSelection = () => {
         reportSelect.add ( newReport )
     })
 
-    reportSelect.addEventListener( 'change', displayReportDetails )   
+    reportSelect.selectedIndex = -1
+    reportSelect.addEventListener( 'change', displayReport )   
 }
 
 
@@ -94,7 +119,7 @@ const getVariables = async () => {
                 })
             })
         })
-        displayReportDetails()
+        // displayReportDetails()
     }
     catch (error ) {
         console.log ( error )

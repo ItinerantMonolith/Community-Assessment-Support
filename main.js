@@ -1,3 +1,9 @@
+/* questions:
+1) cut-and-paste?  Do I need to implement as <table> instead of <div>'s in a grid?
+2) best way to add a delete icon to the fields?
+3) report item - how to I shrink it?
+*/
+
 // note: all the static data (URLs, keys, state codes, etc) is in the staticReport.js file.
 
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.
@@ -5,7 +11,7 @@ let reportTypeTrend = false
 
 const selectCounty = document.getElementById( 'selectCounty' )
 
-const loadYears = async () => {
+const setupReportSelection = async () => {
     // we want to get the 5 most recent available years, so we really just need to find the most recent and take that and the preceding 4.
     // so just do a simple call to get the us population for the years working backwards.
     let lookAgain = true
@@ -25,18 +31,49 @@ const loadYears = async () => {
         }
     }
     
-    // okay, so we know the most recent year, populate our select list.
-    const selectYear = document.getElementById ( 'selectYear' )
+    // now that we know the recent year, we can refresh counties, which needs that before it can make the request.
+    refreshCounties( document.getElementById( 'selectState' ).value )
+
+    // now populate our reportType selector
+    const reportSelectType = document.getElementById( 'selectReportType' )
     for ( i=0; i < 5; i++ ) {
         let newYear = document.createElement( 'option' )
-        newYear.innerText = String( recentYear - i )
+        newYear.innerText = `Single Year Reports for ${String( recentYear - i )}`
         newYear.value = recentYear - i
-        selectYear.add( newYear )
+        reportSelectType.add( newYear )
     }
+    let newReportType = document.createElement ( 'option' )
+    newReportType.innerText = "Trend Reports (most recent 5 years)"
+    newReportType.value = 'trend'
+    reportSelectType.add ( newReportType )
 
-    // let's automatically load the counties for our first state.
-    // we had to wait here until we knew our recentYear before we can do it
-    refreshCounties ( document.getElementById('selectState').options[0].value )
+    // we start with single year reports selected for the current year
+    reportSelectType.selectedIndex = 0
+    reportTypeTrend = false
+    refreshReportSelection()
+
+    // set up the handler for the reportType selector
+    reportSelectType.addEventListener ( 'change', e => { 
+        // we only need to do something here if the trend type changes, not if we change within a trend type
+        const newTrend = e.target.value === 'trend'
+        if ( reportTypeTrend != newTrend ) {
+            reportTypeTrend = newTrend
+            refreshReportSelection()
+        }
+    } )
+
+    const selectReport = document.getElementById( 'selectReport' )
+    selectReport.addEventListener ( 'change', e => {
+        reportList.addFilter ( e.target.options[ e.target.selectedIndex ].innerText, e.target.value )
+    })
+
+    // handlers for the generate and clear reports buttons
+    document.getElementById( 'btnGenerate' ).addEventListener( 'click', generateReports )
+    document.getElementById( 'btnClear' ).addEventListener( 'click', e => {
+        const divTables = document.querySelectorAll( '.divTable' )
+        divTables.forEach ( e => e.remove())
+    })
+    
 }
 
 const refreshCounties = async (state) => {
@@ -64,6 +101,7 @@ const refreshCounties = async (state) => {
         console.log ( `Error trying to get Counties. ${error}`)
     }
 
+    selectCounty.selectedIndex = -1
     countyList.clearList()
     zipList.clearList()
 }
@@ -84,7 +122,14 @@ const validateZip = async ( zip ) => {
         textZip.focus()
     }
     catch (error) {
-        console.log ( error )
+        // a 404 here may mean the zip code doesn't exist
+        if ( error.message.indexOf('404') >= 0) {
+            alert ( `${textZip.value} is not a valid zip code.` )
+            textZip.value = ""
+            textZip.focus()
+        }
+        else
+            console.log ( error )
     }
 }
 
@@ -115,7 +160,7 @@ class FilterList {
         this._filterList.forEach ( e => {
             let newItem = document.createElement( 'div' )
             newItem.innerText = e.name
-            newItem.className = 'areaItem'
+            newItem.className = `areaItem ${this._itemType}Item`
             newItem.dataset.itemType = this.itemType
             newItem.addEventListener ( 'click', e => {
                 let that = this
@@ -201,22 +246,26 @@ class Report {
 
         // put the data in the table
         results.forEach ( (resRow, index) => {
-            resRow.forEach ( e => {
+            resRow.forEach ( (e, index2) => {
                 let newDiv = document.createElement( 'div' )
                 if ( index === 0 )
                     newDiv.className = 'divTableCell divTableHeader'
-                else if ( index === results.length - 1 )
+                else if ( index === results.length - 1 ) {
                     newDiv.className = 'divTableCell divTableSummary'
+                }
                 else
                     newDiv.className = 'divTableCell'
-                
+
+                if ( index2 === 0 ) 
+                    newDiv.classList.add ( 'divTableFirst' )
+
                 newDiv.innerText = e
 
                 tableDiv.appendChild( newDiv )                    
             })
         })
 
-        document.querySelector ( 'main' ).append( tableDiv )
+        document.querySelector ( '#divReportDisplay' ).append( tableDiv )
     }
 
     processResults = () => {
@@ -393,7 +442,7 @@ class Report {
                         this.requestData ( fType, recentYear - (4 - i) )
                 }
                 else
-                    this.requestData ( fType, document.getElementById ( 'selectYear' ).value )
+                    this.requestData ( fType, document.getElementById ( 'selectReportType' ).value )
             }
         }
     }
@@ -414,8 +463,9 @@ const setupGeoFilters = () => {
         newState.value = e.id
         selectState.add ( newState )
     })
+    selectState.selectedIndex = 0
 
-    document.getElementById( 'btnCounty' ).addEventListener ( 'click', () => {
+    document.getElementById( 'selectCounty' ).addEventListener ( 'change', () => {
         countyList.addFilter ( selectCounty.options[ selectCounty.selectedIndex ].innerText, selectCounty.value )
     })
 
@@ -438,38 +488,7 @@ const refreshReportSelection = () => {
         }
     })
     reportList.clearList()
-}
-
-const loadReports = () => {
-    const reportSelectType = document.getElementById( 'selectReportType' )
-    let newReportType = document.createElement ( 'option' )
-    newReportType.innerText = "Single Year Reports"
-    newReportType.value = false
-    reportSelectType.add ( newReportType )
-
-    newReportType = document.createElement ( 'option' )
-    newReportType.innerText = "Trend (Mulit-Year) Reports"
-    newReportType.value = true
-    reportSelectType.add ( newReportType )
-
-    // we start with single year reports selected.
-    reportTypeTrend = false
-    document.getElementById( 'multiMsg' ).style.display = 'none'
-    refreshReportSelection()
-
-    reportSelectType.addEventListener ( 'change', e => {
-        reportTypeTrend = e.target.value === 'true'         // .value seems to convert to a string
-        document.getElementById( 'divSelectYear' ).style.display = reportTypeTrend ? 'none' : ''
-        document.getElementById( 'multiMsg' ).style.display = reportTypeTrend ? '' : 'none'
-        refreshReportSelection() 
-    })
-
-    const selectReport = document.getElementById( 'selectReport' )
-    // wire the handler for btnReport   +==
-    document.getElementById( 'btnReport' ).addEventListener ( 'click', () => {
-        reportList.addFilter ( selectReport.options[ selectReport.selectedIndex ].innerText, selectReport.value )
-    })
-
+    reportSelect.selectedIndex = -1
 }
 
 
@@ -477,7 +496,7 @@ const generateReports = () => {
     // this is where the magic happens!
     // each report will be executed once for each type of geo filter.  if it's a trend report, it will be executed once per year per filter type.
     
-    // +== add a check that we have some geo filters and reports selected..
+    // add a check that we have some geo filters and reports selected..
 
     if ( !countyList.hasFilters && !zipList.hasFilters ) {
         alert ( "Please add one or more Geographic filters.")
@@ -514,14 +533,6 @@ const reportList = new FilterList ( 'report' )
 
 window.onload = () => {
     setupGeoFilters()
-    loadYears()
-    loadReports()
-   
-    // enable the generate button
-    document.getElementById( 'btnGenerate' ).addEventListener( 'click', generateReports )
-    document.getElementById( 'btnClear' ).addEventListener( 'click', e => {
-        const divTables = document.querySelectorAll( '.divTable' )
-        divTables.forEach ( e => e.remove())
-    })
+    setupReportSelection()
 }
 

@@ -8,19 +8,25 @@
     <title>Community Assessment Report Details</title>
 </head>
 <body>
-    <h1>Community Assessment Report Details</h1>
     <header>
-        <h3>This page will explain the details of the underlying data for each of the reports used for the Community Assessements.</h3>
-        For more details on the source of the data and understanding data codes, <br>refer to 
+        <img src="./CommunityAssessment.png" alt="Community Assessment" id="imgCA">
+        <div id='headerText'>
+            <h1>Community Assessment Report Data Details</h1>
+            <h4>This page will explain the details source of the data for each of the reports used for the Community Assessments.<br>
+                For more details on the source of the data and understanding data codes, refer to 
         <a href="https://www.census.gov/content/dam/Census/library/publications/2020/acs/acs_api_handbook_2020_ch02.pdf" target="_blank">Working with the Census Data API</a>
+            </h4> 
+        </div>
     </header>
-    
-    <main>
-        <div id="divReports" class='divSelect'>
-            <h4>View Report Details</h4>
+
+    <div id="reportSelection" class='divSelect'>
+        <div>
+            <label for="selectReport">Select Report to Review</label>
             <select id="selectReport"></select>
         </div>
-    </main>
+    </div>
+
+    <div id="reportDisplay"></div>
 
     <footer><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>

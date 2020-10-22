@@ -8,60 +8,48 @@
     <title>Community Assessment Report Tool</title>
 </head>
 <body>
-    <h1>Community Assessment Report Generator</h1>
     <header>
-        <h3>This tool will allow you to select reports to be generated based on the Census Bureau's American Community Survey data for selected years.  It will be accessing the 5-year estimate (ACS5) data unless otherwise determined.</h3> 
+        <img src="./CommunityAssessment.png" alt="Community Assessment" id="imgCA">
+        <div id='headerText'>
+            <h1>Community Assessment Report Generator</h1>
+            <h4>This tool is designed to rapidly build predetermined reports based on the Census Bureau's American Community Survey data for selected years.  
+                Within the ACS dataset, the reports will use the 5-year estimate (ACS5).</h4> 
+        </div>
     </header>
     <main>
-        <div id="selectionArea">
-            <div id="divReports" class='divSelect'>
-                <div id="divRepType">
-                    <div id="divRepHeader">
-                        <h3>Report Selection</h3>
-                    </div>
-                    <div>
-                        <label for="selectReportType">Report Type</label>
-                        <select id="selectReportType"></select>
-                    </div>
-                    <div id="divSelectYear">
-                        <label for="selectYear">Select Year:</label>
-                        <select id="selectYear"></select>
-                    </div>
-                    <div id="multiMsg">
-                        <span>Trend reports will always pull the most recent 5 years available.</span>
-                    </div>
-                </div>
-                <div id="divSelectReports">
-                    <h3>Reports</h3>
-                    <div>
-                        <label for="selectReport">Select Reports</label>
-                        <select id="selectReport"></select>
-                        <button id="btnReport">Add Report</button>
-                        <div id="reportList" class="selectedList"></div>
-                    </div>
-                </div>
+        <div id="divSelectGeo" class="divSelect">
+            <div id="divGeoHeader">
+                <label for="selectState">Select a State</label><br>
+                <select id="selectState"></select>
             </div>
-            <div id="divSelectGeo" class="divSelect">
-                <div id="divGeoHeader">
-                    <h3>Geographic Filter</h3>
-                    <select id="selectState"></select>
+            <div class="divGeoFilter">
+                <label for="selectCounty">Select Counties</label><br>
+                <select id="selectCounty"></select>
+                <div id="countyList" class="selectedList"></div>
+            </div>
+            <div class="divGeoFilter">
+                <label for="textZip">Select Zip Codes</label><br><input type="text" id="textZip">
+                <button id="btnZip">Add Zip</button>
+                <div id="zipList" class="selectedList"></div>
+            </div>
+        </div>
+        <div id="divReports">
+            <div id="reportSelection" class='divSelect'>
+                <h3>Report Selection</h3>
+                <div>
+                    <label for="selectReportType">Select the type of reports to view</label>
+                    <select id="selectReportType"></select>
                 </div>
                 <div>
-                    <label for="selectCounty">Select County</label>
-                    <select id="selectCounty"></select>
-                    <button id="btnCounty">Add County</button>
-                    <div id="countyList" class="selectedList"></div>
+                    <label for="selectReport">Select Reports</label>
+                    <select id="selectReport"></select>
                 </div>
-                <div>
-                    <label for="textZip">Enter Zip Code</label><input type="text" id="textZip">
-                    <button id="btnZip">Add Zip</button>
-                    <div id="zipList" class="selectedList"></div>
+                <div id="reportList" class="selectedList"></div>
+                <div id="divGenerateReports">
+                    <button id="btnGenerate">Generate Reports</button><button id="btnClear">Clear Reports</button>
                 </div>
             </div>
-            <div id="divGenerateReports">
-                <button id="btnGenerate">Generate Reports</button><button id="btnClear">Clear Reports</button>
-            </div>
-
+            <div id="divReportDisplay"></div>
         </div>
     </main>
     <footer><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
