@@ -53,9 +53,11 @@ const showDataDetail = ( fieldIndex, fieldCell ) => {
     addDiv ( 'Data Label', 'divTableCell dataTableHeader', dataTable )
 
     field.code.split(',').forEach ( code => {
-        let codeDetail = codeReference[ code ].label.split('!!')
+        const codeDetail = codeReference[ code ].label.split('!!')
         codeDetail.shift()  // remove "Estimate"
-        let codeRef = `${CB_STATIC_BASE}${code.substring(0,6)}${CB_STATIC_SET}${code.substring(0,6)}`
+        const baseCode = code.substring(0, code.indexOf('_') )
+        const codeRef = `${CB_STATIC_BASE}${baseCode}${CB_STATIC_SET}${baseCode}`
+        
         addDiv ( `<a href="${codeRef}" target="_blank">${code}</a>`, 'divTableCell', dataTable, true )
         addDiv ( `${codeReference[ code ].concept}`, 'divTableCell', dataTable )
         addDiv ( `${codeDetail.join(', ')}`, 'divTableCell', dataTable )

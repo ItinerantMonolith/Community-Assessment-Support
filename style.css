@@ -12,6 +12,7 @@
     --color4: #f4ebd9ff;
     --color5: #ffe985ff;
     --color6: lightyellow;
+    --color7: sienna;
 }
 
 
@@ -150,13 +151,13 @@ footer {
 }
 
 .reportItem {
-    width: 75%;
+    width: 85%;
     margin: 3px auto;
     background-color: var(--color6);
 }
 
 .areaItem:hover {
-    background-color: red;
+    background-color: var(--color7);
 }
 
 

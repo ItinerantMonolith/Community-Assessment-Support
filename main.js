@@ -1,7 +1,3 @@
-/* questions:
-1) cut-and-paste?  Do I need to implement as <table> instead of <div>'s in a grid?
-*/
-
 // note: all the static data (URLs, keys, state codes, etc) is in the staticReport.js file.
 
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.
@@ -76,6 +72,35 @@ const setupReportSelection = async () => {
     
 }
 
+
+const setupGeoFilters = () => {
+    // load our state list and set up the event listeners & handlers for the county & zip filters
+    
+    const selectState = document.getElementById( 'selectState' )
+
+    selectState.addEventListener ( 'change', e => refreshCounties( e.target.value ) )
+
+    STATES.forEach ( e => {
+        let newState = document.createElement( 'option' )
+        newState.innerText = e.name
+        newState.value = e.id
+        selectState.add ( newState )
+    })
+    selectState.selectedIndex = 0
+
+    document.getElementById( 'selectCounty' ).addEventListener ( 'change', () => {
+        countyList.addFilter ( selectCounty.options[ selectCounty.selectedIndex ].innerText, selectCounty.value )
+    })
+
+    document.getElementById( 'btnZip' ).addEventListener ( 'click', () => {
+        const textZip = document.getElementById( 'textZip' )
+        if ( textZip.value != "" ) 
+            validateZip ( textZip.value )
+    })
+}
+
+
+
 const refreshCounties = async (state) => {
     let urlCounty = `${CB_BASE_URL}${recentYear}${CB_DATASET}NAME&for=county:*&in=state:${state}${CB_API_KEY}`
     try {
@@ -107,8 +132,6 @@ const refreshCounties = async (state) => {
 }
 
 
-
-
 const validateZip = async ( zip ) => {
     try {
         const resp = await axios.get ( `${ZIP_URL}${zip}` )
@@ -134,6 +157,8 @@ const validateZip = async ( zip ) => {
             console.log ( error )
     }
 }
+
+
 
 class FilterList {
     constructor ( itemType, sortAsc = true ) {
@@ -175,11 +200,6 @@ class FilterList {
     clearList () {
         this._filterList.length = 0
         this.updateDisplay()
-    }
-
-    showList () {
-        // for debugging only
-        this._filterList.forEach ( e => console.log ( e ) )
     }
 
     addFilter ( displayText, value ) {
@@ -274,7 +294,7 @@ class Report {
         if ( this._resultCount != this._results.length )
             return
 
-        // All requests processed
+        // If we're here, then all the parallel field requests for this report have been processed
 
         this._results.sort ( (a,b) => {
             if ( a.type === b.type ) {
@@ -288,10 +308,9 @@ class Report {
         // at this point, _results is sorted by type (county, zip, zState), year (only meaningful for _isTrend), and then the first field of the result, which should be the geo area.
         // if it's an _isTrend, we need to transpose the years into columns.
         // otherwise we basically have the report table.
-
         let resultTable = []
         let offset = 0
-        if ( this._isTrend ) {      // because it's trend data, we have to transpose the years
+        if ( this._isTrend ) {      
             let lastType = ''
             this._results.forEach ( qry => {
                 if ( lastType != qry.type ) {
@@ -309,6 +328,7 @@ class Report {
                 qry.data.forEach ( (e, index) => {
                     // e is a row (array) of result data.
                     // tag the results with field types, and we might have a percent to process, which uses two fields
+                    // +== in the future, we could have a percent with a multi-code numerator, need to support that.
                     resultTable[ index + offset ].push ( this._fields[0].type === 'percent' ? `${(100*e[1]/e[2]).toFixed(1)}%` :  parseInt( e[1] ).toLocaleString()  )
                 })
             })
@@ -327,8 +347,7 @@ class Report {
                         fieldOffset++
                         // deal with percentage here.
                         if ( ( field.type === 'percent' ) || ( field.type === 'sumPct' ) ) {
-                            // newArr.push( { type: 'percent', value: (100 * e[fieldOffset] / e[fieldOffset + 1 ]).toFixed(1) } )
-                            // fieldOffset++
+                            
                             // in this case this._fields.code will have multiple comma separated entries, the last is the divisor, all others should be totaled for the numerator
                             let sum = 0
                             let fieldCount = field.code.split(',').length - 1
@@ -337,12 +356,17 @@ class Report {
                                 fieldOffset++
                                 fieldCount--
                             }
-                            let sumPct = (100 * sum / e[fieldOffset]).toFixed(1)
-                            if ( field.type === 'percent' )
-                                newArr.push( `${sumPct}%` )
-                            else {
-                                newArr.push( `${parseInt( sum ).toLocaleString()} (${sumPct}%)` )
+                            // if the denominator is 0, we don't want to show anything.
+                            if ( parseInt( e[fieldOffset] ) ) {
+                                let sumPct = (100 * sum / e[fieldOffset]).toFixed(1)
+                                if ( field.type === 'percent' )
+                                    newArr.push( `${sumPct}%` )
+                                else {
+                                    newArr.push( `${parseInt( sum ).toLocaleString()} (${sumPct}%)` )
+                                }
                             }
+                            else
+                                newArr.push( 'n/a' )
                         }
                         else if ( field.type === 'sum' ) {
                             // in this case this._fields.code will have multiple comma separated entries.
@@ -368,7 +392,6 @@ class Report {
             })
         }
 
-        // console.log ( resultTable )
         this.displayResults ( resultTable )
     }
 
@@ -424,7 +447,6 @@ class Report {
             this.processResults()
         }
         catch ( error ) {
-            // +== add better error handling
             console.log ( `Error in requestData: ${error}`)
         }
     }
@@ -452,32 +474,6 @@ class Report {
 }
 
 
-const setupGeoFilters = () => {
-    // load our state list and set up the event listeners & handlers for the county & zip filters
-    
-    const selectState = document.getElementById( 'selectState' )
-
-    selectState.addEventListener ( 'change', e => refreshCounties( e.target.value ) )
-
-    STATES.forEach ( e => {
-        let newState = document.createElement( 'option' )
-        newState.innerText = e.name
-        newState.value = e.id
-        selectState.add ( newState )
-    })
-    selectState.selectedIndex = 0
-
-    document.getElementById( 'selectCounty' ).addEventListener ( 'change', () => {
-        countyList.addFilter ( selectCounty.options[ selectCounty.selectedIndex ].innerText, selectCounty.value )
-    })
-
-    document.getElementById( 'btnZip' ).addEventListener ( 'click', () => {
-        const textZip = document.getElementById( 'textZip' )
-        if ( textZip.value != "" ) 
-            validateZip ( textZip.value )
-    })
-}
-
 const refreshReportSelection = () => {
     const reportSelect = document.getElementById( 'selectReport' )
     reportSelect.length = 0
@@ -499,13 +495,12 @@ const generateReports = () => {
     // each report will be executed once for each type of geo filter.  if it's a trend report, it will be executed once per year per filter type.
     
     // add a check that we have some geo filters and reports selected..
-
     if ( !countyList.hasFilters && !zipList.hasFilters ) {
         alert ( "Please add one or more Geographic filters.")
         return
     }
     if ( !reportList.hasFilters ) {
-        alert ( "Please select one or more reports" )     // prettify that
+        alert ( "Please select one or more reports" )     
         return
     }
 
@@ -521,13 +516,9 @@ const generateReports = () => {
         reports.push ( newReport )
     })
 
-    // request each report to go request it's data.
-    // When they return are we filling in the reports dynamically, or do we wait for them all?
-    //      if dynamic, do we reorder them as they come in?
+    // request each report to go execute
     reports.forEach ( e => e.runReports() )
 }
-
-
 
 const countyList = new FilterList ( 'county' )
 const zipList = new FilterList ( 'zip' )
