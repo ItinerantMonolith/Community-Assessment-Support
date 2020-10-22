@@ -1,6 +1,9 @@
-const BASE_URL = "https://api.census.gov/data/"
-const DATASET = "/acs/acs5?get="
-const API_KEY = "&key=00032a8653c1b9fb53c830c4c2537cdb4e637e5f"
+const CB_BASE_URL = "https://api.census.gov/data/"
+const CB_DATASET = "/acs/acs5?get="
+const CB_API_KEY = "&key=00032a8653c1b9fb53c830c4c2537cdb4e637e5f"
+const CB_STATIC_BASE = "https://data.census.gov/cedsci/table?q="
+const CB_STATIC_SET = "&tid=ACSDT1Y2018."
+
 
 const ZIP_URL = 'http://api.zippopotam.us/US/'
 

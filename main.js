@@ -1,13 +1,13 @@
 /* questions:
 1) cut-and-paste?  Do I need to implement as <table> instead of <div>'s in a grid?
-2) best way to add a delete icon to the fields?
-3) report item - how to I shrink it?
 */
 
 // note: all the static data (URLs, keys, state codes, etc) is in the staticReport.js file.
 
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.
 let reportTypeTrend = false
+
+const iconTrash = '<i class="material-icons" style="font-size:12px;">delete</i>'
 
 const selectCounty = document.getElementById( 'selectCounty' )
 
@@ -18,7 +18,7 @@ const setupReportSelection = async () => {
     recentYear = new Date().getFullYear() - 1       // start with last year, by definition there can't be a report for this year available
 
     while ( lookAgain ) {
-        let urlPop = `${BASE_URL}${recentYear}${DATASET}B01003_001E&for=us${API_KEY}`
+        let urlPop = `${CB_BASE_URL}${recentYear}${CB_DATASET}B01003_001E&for=us${CB_API_KEY}`
         try {
             let resp = await axios.get ( urlPop )
             lookAgain = false
@@ -77,7 +77,7 @@ const setupReportSelection = async () => {
 }
 
 const refreshCounties = async (state) => {
-    let urlCounty = `${BASE_URL}${recentYear}${DATASET}NAME&for=county:*&in=state:${state}${API_KEY}`
+    let urlCounty = `${CB_BASE_URL}${recentYear}${CB_DATASET}NAME&for=county:*&in=state:${state}${CB_API_KEY}`
     try {
         let resp = await axios.get ( urlCounty )
         // clear the list
@@ -105,6 +105,8 @@ const refreshCounties = async (state) => {
     countyList.clearList()
     zipList.clearList()
 }
+
+
 
 
 const validateZip = async ( zip ) => {
@@ -157,14 +159,14 @@ class FilterList {
     updateDisplay ()  {
         this.clearDisplay()
         // clear and refresh the display list for this geo type
-        this._filterList.forEach ( e => {
+        this._filterList.forEach ( filter => {
             let newItem = document.createElement( 'div' )
-            newItem.innerText = e.name
+            newItem.innerText = filter.name
             newItem.className = `areaItem ${this._itemType}Item`
             newItem.dataset.itemType = this.itemType
             newItem.addEventListener ( 'click', e => {
                 let that = this
-                this.removeItem (that, e.target.innerText)
+                this.removeItem (that, e.target.innerHTML)
             })
             this._divList.append( newItem )
         })
@@ -406,7 +408,7 @@ class Report {
             geoString += stateString
         }
 
-        let myURL = `${BASE_URL}${year}${DATASET}${fieldString}${geoString}${API_KEY}`
+        let myURL = `${CB_BASE_URL}${year}${CB_DATASET}${fieldString}${geoString}${CB_API_KEY}`
 
         try {
             let response = await axios.get ( myURL )

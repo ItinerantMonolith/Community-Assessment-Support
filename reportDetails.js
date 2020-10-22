@@ -1,94 +1,111 @@
 const codeReference = {}
 
-const clearReportDetails = () => {
-    const mainReport = document.querySelector( '.mainReport' )
-    if ( mainReport )
-        mainReport.remove()
-}
-
 const typeDisplay = { 
     number: 'Number',
-    percent: 'Percent:  all but last data elements are added together and divided by the final element',
-    sum: 'Sum: all data elements are added together',
-    sumPct: 'Sum/Percent:   all but last data elements are added together and divided by the final element. Sum (numerator) is also displayed.',
+    percent: 'Percentage: data elements are totalled and divided by the overall Total',
+    sum: 'Total: all data elements are added together',
+    sumPct: 'Percentage: data elements are totalled and divided by the overall Total',
     string: 'String',
     decimal: 'Number with a single decimal point'
     }
 
+const clearHeaders = () => {
+    const headers = document.querySelectorAll( '.divTableHeader' )
+    headers.forEach( e => { e.classList.remove( 'selectedCell' ) } )
+}
 
-const displayReportDetails = () => {
-    clearReportDetails ()
+const clearDetails = () => {
+    const detailRow = document.getElementById( 'detailRow' )
+    while ( detailRow.children.length )
+        detailRow.lastChild.remove()
+}
 
-    const report = REPORTS[ document.getElementById( 'selectReport' ).value ]
+const addDiv = ( text, className, target, asHTML = false ) => {
+    const newDiv = document.createElement( 'div' )
+    if ( text ) {
+        if ( asHTML )
+            newDiv.innerHTML = text
+        else
+            newDiv.innerText = text
+    }
+        
+    if ( className )
+        newDiv.className = className
+    target.appendChild ( newDiv )
+}
 
-    //  Report Title
-    //  Trend or Year based
-    //  list of fields, for each
-    //      Field Name
-    //          list of data elements that comprise it, with data type.
+const showDataDetail = ( fieldIndex, fieldCell ) => {
+    clearDetails()
+    clearHeaders()
+    
+    const detailRow = document.getElementById( 'detailRow' )
+    fieldCell.classList.add ( 'selectedCell' )
 
-    const mainReport = document.createElement( 'div' )
-    mainReport.className = 'mainReport' 
-    addLabel( mainReport, 'Title:' ) 
-    addDiv( mainReport, report.name )
-    addLabel( mainReport, 'Type:' )
-    addDiv( mainReport, report.isTrend ? 'Trend Report (most recent 5 years)' : 'Single Year Report' )
-    report.fields.forEach ( field => {
-        let fieldBlock = document.createElement( 'div' )
-        fieldBlock.className = 'fieldBlock'
-        addLabel( fieldBlock, 'Field:' ) 
-        addDiv( fieldBlock, field.name )
-        addLabel( fieldBlock, 'Type:' )
-        addDiv( fieldBlock, typeDisplay[ field.type ] )
-        addLabel( fieldBlock, 'Data:' )
-        addDiv( fieldBlock )
-        field.code.split(',').forEach ( code => {
-            addDiv( fieldBlock )
-            let codeDetail = codeReference[ code ].label.split('!!')
-            codeDetail.shift()  // remove "Estimate"
-            let codeStr = `${code}: ${codeReference[ code ].concept} : ${codeDetail.join(', ')}`
-            addDiv( fieldBlock,codeStr )
-        })
+    const field = REPORTS[ document.getElementById( 'selectReport' ).value ].fields[ fieldIndex ]
 
-        mainReport.appendChild( fieldBlock )
+    addDiv ( `<strong>Field Type: </strong>${typeDisplay[field.type]}`, '', detailRow, true )
+
+    const dataTable = document.createElement( 'div' )
+    dataTable.className = 'dataTable'
+
+    addDiv ( 'Data Code', 'divTableCell dataTableHeader', dataTable )
+    addDiv ( 'Source Table Concept', 'divTableCell dataTableHeader', dataTable )
+    addDiv ( 'Data Label', 'divTableCell dataTableHeader', dataTable )
+
+    field.code.split(',').forEach ( code => {
+        let codeDetail = codeReference[ code ].label.split('!!')
+        codeDetail.shift()  // remove "Estimate"
+        let codeRef = `${CB_STATIC_BASE}${code.substring(0,6)}${CB_STATIC_SET}${code.substring(0,6)}`
+        addDiv ( `<a href="${codeRef}" target="_blank">${code}</a>`, 'divTableCell', dataTable, true )
+        addDiv ( `${codeReference[ code ].concept}`, 'divTableCell', dataTable )
+        addDiv ( `${codeDetail.join(', ')}`, 'divTableCell', dataTable )
     })
-
-    document.querySelector( '#divReports' ).appendChild( mainReport )
+    
+    detailRow.appendChild ( dataTable )
 }
 
 
 const displayReport = () => {
+    const reportDisplay = document.querySelector( '#reportDisplay' )
+    while ( reportDisplay.children.length ) 
+        reportDisplay.lastChild.remove()
+
+
     const report = REPORTS[ document.getElementById( 'selectReport' ).value ]
 
-    let tableDiv = document.createElement( 'div' )
+    const tableDiv = document.createElement( 'div' )
     tableDiv.className = 'divTable'
-    tableDiv.style.gridTemplateColumns = '1fr '.repeat( report.fields.length + 1 );
+    tableDiv.style.gridTemplateColumns = '1fr '.repeat( report.fields.length );
 
     // give the report a title
-    let newTitle = document.createElement ( 'div' )
+    const newTitle = document.createElement ( 'div' )
     newTitle.className = 'divTableTitle'
     newTitle.innerText = report.name
-    newTitle.style.gridColumn = `span ${report.fields.length + 1}`
+    newTitle.style.gridColumn = `span ${report.fields.length}`
     tableDiv.appendChild( newTitle )
 
-    let newType = document.createElement ( 'div' )
+    const newType = document.createElement ( 'div' )
     newType.innerHTML = `<em>${report.isTrend ? 'Trend Report (most recent 5 years)' : 'Single Year Report'}</em>`
-    newType.style.gridColumn =  `span ${report.fields.length + 1}`
+    newType.style.gridColumn =  `span ${report.fields.length}`
     tableDiv.appendChild( newType )
 
-    let newCell = document.createElement( 'div' )
-    newCell.innerText = 'Geographic Area'
-    newCell.className = 'divTableCell divTableHeader divTableFirst'
-    tableDiv.appendChild( newCell )
-    report.fields.forEach ( e => {
+    report.fields.forEach ( (field, index) => {
         let newCell = document.createElement( 'div' )
-        newCell.innerHTML = e.name
-        newCell.className = 'divTableCell divTableHeader'
+        newCell.innerText = field.name
+        newCell.className = 'divTableCell divTableHeader divReportDetail'
+        newCell.addEventListener( 'click', (e) => { 
+            showDataDetail ( index, e.target) 
+        } )
         tableDiv.appendChild( newCell )
     })
     
+    let detailRow = document.createElement( 'div' )
+    detailRow.className = 'divTableCell'
+    detailRow.id = 'detailRow'
+    detailRow.style.gridColumn = `span ${report.fields.length}`
+    tableDiv.appendChild( detailRow )
 
-    document.querySelector( '#reportDisplay' ).appendChild( tableDiv )
+    reportDisplay.appendChild( tableDiv )
 }
 
 

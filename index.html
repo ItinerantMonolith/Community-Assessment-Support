@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans&display=swap" rel="stylesheet">
     <title>Community Assessment Report Tool</title>
 </head>
@@ -34,17 +36,17 @@
             </div>
         </div>
         <div id="divReports">
-            <div id="reportSelection" class='divSelect'>
+            <div class='divSelect reportSelection'>
                 <h3>Report Selection</h3>
                 <div>
                     <label for="selectReportType">Select the type of reports to view</label>
                     <select id="selectReportType"></select>
                 </div>
-                <div>
+                <div id='divReportFilter'>
                     <label for="selectReport">Select Reports</label>
                     <select id="selectReport"></select>
+                    <div id="reportList" class="selectedList"></div>
                 </div>
-                <div id="reportList" class="selectedList"></div>
                 <div id="divGenerateReports">
                     <button id="btnGenerate">Generate Reports</button><button id="btnClear">Clear Reports</button>
                 </div>
@@ -52,7 +54,7 @@
             <div id="divReportDisplay"></div>
         </div>
     </main>
-    <footer><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
+    <footer>For a breakdown of the data elements which comprise the reports, go to the <a href="./reportDetails.html">Report Data Details</a> page.<br><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
 
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="staticReport.js"></script>

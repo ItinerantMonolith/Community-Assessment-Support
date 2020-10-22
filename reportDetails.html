@@ -9,7 +9,9 @@
 </head>
 <body>
     <header>
-        <img src="./CommunityAssessment.png" alt="Community Assessment" id="imgCA">
+        <a href="./index.html">
+            <img src="./CommunityAssessment.png" alt="Community Assessment" id="imgCA">
+        </a>
         <div id='headerText'>
             <h1>Community Assessment Report Data Details</h1>
             <h4>This page will explain the details source of the data for each of the reports used for the Community Assessments.<br>
@@ -18,16 +20,16 @@
             </h4> 
         </div>
     </header>
-
-    <div id="reportSelection" class='divSelect'>
-        <div>
-            <label for="selectReport">Select Report to Review</label>
-            <select id="selectReport"></select>
+    <div id="mainDiv">
+        <div id="reportSelection" class='divSelect'>
+            <div>
+                <label for="selectReport">Select Report to Review</label>
+                <select id="selectReport"></select>
+            </div>
         </div>
+
+        <div id="reportDisplay"></div>
     </div>
-
-    <div id="reportDisplay"></div>
-
     <footer><em>This product uses the Census Bureau Data API but is not endorsed or certified by the Census Bureau. </em></footer>
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
     <script src="staticReport.js"></script>
