@@ -27,31 +27,11 @@ https://api.census.gov/data/2018/acs/acs5?get=NAME,B01003_001E&for=county:053,11
 ```
 The returned result is json but formatted as an array of data arrays, with the first array giving the equivalent of object names or column headings, depending on how you view it.
 ```
-[
-[
-"NAME",
-"B01003_001E",
-"state",
-"county"
-],
-[
-"Sumter County, Florida",
-"120999",
-"12",
-"119"
-],
-[
-"Volusia County, Florida",
-"527634",
-"12",
-"127"
-],
-[
-"Hernando County, Florida",
-"182696",
-"12",
-"053"
-]
+[   
+    [ "NAME", "B01003_001E", "state", "county" ],
+    [ "Sumter County, Florida", "120999", "12", "119" ],
+    [ "Volusia County, Florida", "527634", "12", "127" ],
+    [ "Hernando County, Florida", "182696", "12", "053" ]
 ]
 ```
 
@@ -64,6 +44,7 @@ The returned result is json but formatted as an array of data arrays, with the f
 5. ...be able to select one or more of the predefined reports to generate.
 6. ...be able to unselect specific elements of the request (geographic areas, reports) before requesting the reports.
 7. ...be able to see the results of all of the chosen reports from the selected year(s) and geographic area(s).
+8. ...be able to review the source of data for each report
 
 ## Tracking
 #### Task tracking will be on a kanban board at Trello: https://trello.com/b/hNTAwNWs

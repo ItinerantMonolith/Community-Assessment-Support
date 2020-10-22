@@ -195,6 +195,7 @@ class FilterList {
             })
             this._divList.append( newItem )
         })
+        checkGenerateButton()
     }
 
     clearList () {
@@ -490,20 +491,16 @@ const refreshReportSelection = () => {
 }
 
 
+const checkGenerateButton = () => {
+    // if we have no reports or we have no geo filters, we can't generate anything
+    document.getElementById( 'btnGenerate' ).disabled = ( !countyList.hasFilters && !zipList.hasFilters ) || ( !reportList.hasFilters ) 
+}
+
+
 const generateReports = () => {
     // this is where the magic happens!
     // each report will be executed once for each type of geo filter.  if it's a trend report, it will be executed once per year per filter type.
     
-    // add a check that we have some geo filters and reports selected..
-    if ( !countyList.hasFilters && !zipList.hasFilters ) {
-        alert ( "Please add one or more Geographic filters.")
-        return
-    }
-    if ( !reportList.hasFilters ) {
-        alert ( "Please select one or more reports" )     
-        return
-    }
-
     // create an array of report instances
     const reports = []
 

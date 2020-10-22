@@ -132,6 +132,12 @@ footer {
     margin: 5px auto;
 }
 
+#reportDetailSelection {
+    background-color: var(--color3);
+    color: white;
+    margin: 3px;
+}
+
 #divReportFilter {
     margin: 10px 50px;
 }
@@ -167,11 +173,10 @@ footer {
 }
 
 #btnGenerate, #btnClear {
-    padding: 5px 10px;
+    padding: 5px 20px;
     border-radius: 5px;
     font-size: 20px;
-    color: purple;
-    margin: 10px;
+    margin: 10px 30px;
 }
 
 /* .selectedList {
