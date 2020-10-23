@@ -68,9 +68,28 @@ const setupReportSelection = async () => {
         const divReportDisplay = document.getElementById( 'divReportDisplay' )
         while ( divReportDisplay.children.length ) 
             divReportDisplay.lastChild.remove()
+        reportList.clearList()
+        enableCopyButton ( false )
     })   
+
+    // also for the copy button
+    document.getElementById( 'btnCopy' ).addEventListener( 'click', () => {
+        let range = document.createRange();
+        range.selectNodeContents( document.querySelector( '#divReportDisplay') );
+
+        let selection = window.getSelection();        
+        selection.removeAllRanges();
+        selection.addRange(range);
+
+        document.execCommand('copy')
+        selection.removeAllRanges();
+
+        alert ('All generated reports have been copied to the Clipboard!')
+    })
+    enableCopyButton ( false )
 }
 
+const enableCopyButton = enableFlag => { document.getElementById( 'btnCopy').disabled = !enableFlag }
 
 const setupGeoFilters = () => {
     // load our state list and set up the event listeners & handlers for the county & zip filters
@@ -289,26 +308,11 @@ class Report {
             newTable.append( newRow )
         })
 
-        const myButton = document.createElement ( 'button' )
-        myButton.innerText = 'Copy to Clipboard'
-        // myButton.style.height = '16px'
 
-        myButton.addEventListener( 'click', e => {
-
-            let range = document.createRange();
-            range.selectNodeContents( newTable );
-    
-            let selection = window.getSelection();        
-            selection.removeAllRanges();
-            selection.addRange(range);
-    
-            document.execCommand('copy')
-            selection.removeAllRanges();
-        })
-
-
-         document.querySelector ( '#divReportDisplay' ).append( newTable )
-         document.querySelector ( '#divReportDisplay' ).appendChild( myButton )
+        document.querySelector ( '#divReportDisplay' ).append( newTable )
+        const blankRow = document.createElement('div')
+        blankRow.innerHTML = '<br>' 
+        document.querySelector ( '#divReportDisplay' ).append( blankRow )
     }
 
 
@@ -553,7 +557,9 @@ const refreshReportSelection = () => {
 
 const checkGenerateButton = () => {
     // if we have no reports or we have no geo filters, we can't generate anything
-    document.getElementById( 'btnGenerate' ).disabled = ( !countyList.hasFilters && !zipList.hasFilters ) || ( !reportList.hasFilters ) 
+    document.getElementById( 'btnGenerate' ).disabled = ( !countyList.hasFilters && !zipList.hasFilters ) || ( !reportList.hasFilters )
+
+    document.getElementById( 'btnClear' ).disabled = ( !reportList.hasFilters  && !document.getElementById( 'divReportDisplay').children.length )
 }
 
 
@@ -575,6 +581,7 @@ const generateReports = () => {
 
     // request each report to go execute
     reports.forEach ( e => e.runReports() )
+    enableCopyButton ( true )
 }
 
 const countyList = new FilterList ( 'county' )

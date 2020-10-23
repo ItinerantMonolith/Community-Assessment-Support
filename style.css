@@ -197,7 +197,7 @@ footer {
     text-align: center;
 }
 
-#btnGenerate, #btnClear {
+#btnGenerate, #btnClear, #btnCopy {
     padding: 5px 20px;
     border-radius: 5px;
     font-size: 20px;
