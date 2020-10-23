@@ -559,6 +559,7 @@ const checkGenerateButton = () => {
     // if we have no reports or we have no geo filters, we can't generate anything
     document.getElementById( 'btnGenerate' ).disabled = ( !countyList.hasFilters && !zipList.hasFilters ) || ( !reportList.hasFilters )
 
+    // the clear button should be active if we have reports selected in the filter or results generated
     document.getElementById( 'btnClear' ).disabled = ( !reportList.hasFilters  && !document.getElementById( 'divReportDisplay').children.length )
 }
 

@@ -5,7 +5,6 @@
     --eggshell: #f4ebd9ff;
     --yellow-crayola: #ffe985ff;
 
-
     /* color palette 1
     --color1: #2f2323ff;
     --color2: #666a86ff;
@@ -190,7 +189,6 @@ footer {
 .areaItem:hover {
     background-color: var(--color7);
 }
-
 
 #divGenerateReports {
     grid-column: span 3;
