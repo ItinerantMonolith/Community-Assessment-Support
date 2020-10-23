@@ -128,6 +128,8 @@ const refreshReportSelection = () => {
 
 
 const getVariables = async () => {
+    // we need to pull the master variable list one time, then trim it down to the codes that we care about.
+    // if later on we extend this to dynamically building reports, we'll need these variables/codes.
     try {
         const resp = await axios.get ( 'https://api.census.gov/data/2018/acs/acs5/variables.json' )
 
@@ -138,7 +140,6 @@ const getVariables = async () => {
                 })
             })
         })
-        // displayReportDetails()
     }
     catch (error ) {
         console.log ( error )

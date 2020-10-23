@@ -3,8 +3,6 @@
 let recentYear = 0      // this will get set to the most recent year we have available acs5 data.  use it as a default for reference calls as well.
 let reportTypeTrend = false
 
-const iconTrash = '<i class="material-icons" style="font-size:12px;">delete</i>'
-
 const selectCounty = document.getElementById( 'selectCounty' )
 
 const setupReportSelection = async () => {
@@ -22,12 +20,13 @@ const setupReportSelection = async () => {
         catch ( error ) {
             recentYear--;
             if ( recentYear < new Date().getFullYear() - 5 ) {       // we have a problem getting the data
+                alert ('Unable to load reference information from the Census Bureau.')
                 return
             }
         }
     }
     
-    // now that we know the recent year, we can refresh counties, which needs that before it can make the request.
+    // now that we know the recent year, we can refresh counties, which needs a year  before it can make the request.
     refreshCounties( document.getElementById( 'selectState' ).value )
 
     // now populate our reportType selector
@@ -58,8 +57,7 @@ const setupReportSelection = async () => {
         }
     } )
 
-    const selectReport = document.getElementById( 'selectReport' )
-    selectReport.addEventListener ( 'change', e => {
+    document.getElementById( 'selectReport' ).addEventListener ( 'change', e => {
         reportList.addFilter ( e.target.options[ e.target.selectedIndex ].innerText, e.target.value )
     })
 
@@ -68,8 +66,7 @@ const setupReportSelection = async () => {
     document.getElementById( 'btnClear' ).addEventListener( 'click', e => {
         const divTables = document.querySelectorAll( '.divTable' )
         divTables.forEach ( e => e.remove())
-    })
-    
+    })   
 }
 
 
@@ -122,7 +119,6 @@ const refreshCounties = async (state) => {
         })
     }
     catch ( error ) {
-        // +== add better error handling
         console.log ( `Error trying to get Counties. ${error}`)
     }
 
@@ -147,7 +143,7 @@ const validateZip = async ( zip ) => {
         textZip.focus()
     }
     catch (error) {
-        // a 404 here may mean the zip code doesn't exist
+        // a 404 here probably means the zip code doesn't exist
         if ( error.message.indexOf('404') >= 0) {
             alert ( `${textZip.value} is not a valid zip code.` )
             textZip.value = ""
@@ -157,7 +153,6 @@ const validateZip = async ( zip ) => {
             console.log ( error )
     }
 }
-
 
 
 class FilterList {
@@ -225,7 +220,7 @@ class FilterList {
 class Report {
     constructor ( reportDefinition ) {
         this._name = reportDefinition.name
-        this._fields = reportDefinition.fields    // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E' }, {...}, ... ]
+        this._fields = reportDefinition.fields    // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E', type: 'number' }, {...}, ... ]
         this._isTrend = reportDefinition.isTrend // trend report should have only one field and will be applied to multiple years
         this._results = []
         this._resultCount = 0
