@@ -243,6 +243,23 @@ footer {
     justify-content: flex-start;
 }
 
+.reportTable {
+    border-collapse: collapse;
+}
+
+.reportTableCell {
+    border: 2px solid black;
+    padding: 2px 4px;
+    text-align: center;
+}
+
+.reportTableFirst {
+    text-align: left;
+}
+
+
+
+
 .mainReport {
     display: grid;
     grid-template-columns: 60px 1fr;

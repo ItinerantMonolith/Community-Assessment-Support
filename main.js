@@ -63,9 +63,11 @@ const setupReportSelection = async () => {
 
     // handlers for the generate and clear reports buttons
     document.getElementById( 'btnGenerate' ).addEventListener( 'click', generateReports )
+    
     document.getElementById( 'btnClear' ).addEventListener( 'click', e => {
-        const divTables = document.querySelectorAll( '.divTable' )
-        divTables.forEach ( e => e.remove())
+        const divReportDisplay = document.getElementById( 'divReportDisplay' )
+        while ( divReportDisplay.children.length ) 
+            divReportDisplay.lastChild.remove()
     })   
 }
 
@@ -247,10 +249,71 @@ class Report {
         return header
     }
 
-    displayResults ( results ) {
-        // build the header row and stick it in front
-        results.unshift ( this.headerRow () )
+    displayResultsAsTable ( results ) {
 
+        let newTable = document.createElement( 'table' )
+        newTable.classList = 'reportTable'
+        newTable.id = 'table1'
+        // report title
+        let titleRow = document.createElement( 'tr' )
+        let titleCell = document.createElement( 'td' )
+        titleCell.innerText = this._name
+        titleCell.colSpan = results[0].length
+        titleCell.className = 'divTableTitle'
+    
+        titleRow.append( titleCell )
+        newTable.append( titleRow )
+
+        // put the data in the table
+        results.forEach ( (resRow, index) => {
+            let newRow = document.createElement( 'tr' )
+            newRow.style.padding = '0px'
+            resRow.forEach ( (e, index2) => {
+                let newCell = document.createElement( 'td' )
+                    
+                if ( index === 0 )
+                    newCell.className = 'reportTableCell divTableHeader'
+                else if ( index === results.length - 1 ) {
+                    newCell.className = 'reportTableCell divTableSummary'
+                }
+                else
+                    newCell.className = 'reportTableCell'
+
+                if ( index2 === 0 ) 
+                    newCell.classList.add ( 'reportTableFirst' )
+
+                newCell.innerText = e
+
+                newRow.appendChild( newCell )                    
+            })
+            newTable.append( newRow )
+        })
+
+        const myButton = document.createElement ( 'button' )
+        myButton.innerText = 'Copy to Clipboard'
+        // myButton.style.height = '16px'
+
+        myButton.addEventListener( 'click', e => {
+
+            let range = document.createRange();
+            range.selectNodeContents( newTable );
+    
+            let selection = window.getSelection();        
+            selection.removeAllRanges();
+            selection.addRange(range);
+    
+            document.execCommand('copy')
+            selection.removeAllRanges();
+        })
+
+
+         document.querySelector ( '#divReportDisplay' ).append( newTable )
+         document.querySelector ( '#divReportDisplay' ).appendChild( myButton )
+    }
+
+
+    displayResults ( results ) {
+        
         let tableDiv = document.createElement( 'div' )
 
         tableDiv.className = 'divTable'
@@ -388,7 +451,10 @@ class Report {
             })
         }
 
-        this.displayResults ( resultTable )
+        // build the header row and stick it on the front
+        resultTable.unshift ( this.headerRow () )
+        // this.displayResults ( resultTable )
+        this.displayResultsAsTable ( resultTable )
     }
 
 
@@ -428,7 +494,6 @@ class Report {
         }
 
         let myURL = `${CB_BASE_URL}${year}${CB_DATASET}${fieldString}${geoString}${CB_API_KEY}`
-
         try {
             let response = await axios.get ( myURL )
             let respData = response.data
