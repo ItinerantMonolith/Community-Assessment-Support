@@ -478,12 +478,12 @@ class Report {
         else {
             let whichFilters = null
             let stateString = ''
+            stateString = `&in=state:${this._state}`
         
             if ( filterType === 'county' ) {
                 geoString += 'county:'
                 // counties must be 3 digits
                 whichFilters = this._countyFilters
-                stateString = `&in=state:${this._state}`
             }
             else {      // 'zip'
                 geoString += 'zip%20code%20tabulation%20area:'
