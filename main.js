@@ -476,6 +476,7 @@ class Report {
             geoString = `&for=state:${this._state}`
         }
         else {
+            let useState = true
             let whichFilters = null
             let stateString = ''
             stateString = `&in=state:${this._state}`
@@ -488,14 +489,19 @@ class Report {
             else {      // 'zip'
                 geoString += 'zip%20code%20tabulation%20area:'
                 whichFilters = this._zipFilters
+                useState = (year >= 2019 )
             }
             let isFirst = true
             whichFilters.forEach ( e => {
                 geoString += `${isFirst ? '' : ','}${String(e.filterID)}`
                 isFirst = false
             })
-            geoString += stateString
+            if (useState)
+                geoString += stateString
         }
+
+        // for any year pre-2019, we need just zips.
+        // for 2019+, we need state and zips.
 
         let myURL = `${CB_BASE_URL}${year}${CB_DATASET}${fieldString}${geoString}${CB_API_KEY}`
         try {
