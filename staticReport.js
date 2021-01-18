@@ -272,26 +272,54 @@ const REPORTS = [
    {
       name: 'Poverty Rate by Family Status and Geographic Area',
       fields: [
-          {
-            name:
-               'All Familes with Related Children Under Age 5',
-            code: 'B17010_005E,B17010_012E,B17010_018E,B17010_025E,B17010_032E,B17010_038E',
+         {
+            name: 'All Familes with Related Children Under Age 5',
+            code:
+               'B17010_005E,B17010_012E,B17010_018E,B17010_025E,B17010_032E,B17010_038E',
             type: 'percent',
-            numeratorCnt: 3
+            numeratorCnt: 3,
          },
          {
             name: 'Married-couple Families with Related Children Under Age 5',
             code: 'B17010_005E,B17010_025E',
             type: 'percent',
-            numeratorCnt: 1
-        },
-        {
-            name: 'Families with Female Householder, No Spouse Present, with Related Children Under Age 5',
+            numeratorCnt: 1,
+         },
+         {
+            name:
+               'Families with Female Householder, No Spouse Present, with Related Children Under Age 5',
             code: 'B17010_018E,B17010_038E',
             type: 'percent',
-            numeratorCnt: 1
-        },
+            numeratorCnt: 1,
+         },
       ],
-      isTrend: false
+      isTrend: false,
+   },
+   {
+      name:
+         'Percentage of Children (ages 0 to 18 years old) by Relationship to Householder and Geographic Area',
+      fields: [
+         {
+            name: 'Own Child (biological, step, or adopted)',
+            code: 'B09018_002E,B09018_001E',
+            type: 'percent',
+         },
+         {
+            name: 'Grandchild',
+            code: 'B09018_006E,B09018_001E',
+            type: 'percent',
+         },
+         {
+            name: 'Other Relatives',
+            code: 'B09018_007E,B09018_001E',
+            type: 'percent',
+         },
+         {
+            name: 'Foster child or other unrelated child',
+            code: 'B09018_008E,B09018_001E',
+            type: 'percent',
+         },
+      ],
+      isTrend: false,
    },
 ]

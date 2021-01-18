@@ -418,36 +418,13 @@ class Report {
                      let sum = 0
                      let den = 0
                      let fieldCount = field.code.split(',').length
-                     console.log('fieldCount', fieldCount)
                      let numEnd = fieldOffset + fieldCount - 2
                      let denStart = fieldOffset + fieldCount - 1
                      if ('numeratorCnt' in field) {
                         numEnd = fieldOffset + field.numeratorCnt - 1
                         denStart = fieldOffset
                      }
-                     console.log ( numEnd, denStart)
-                     //  for (let i = 1; i <= fieldCount; i++) {
-                     //     console.log(i, e[i])
-                     //     if (i <= numEnd) {
-                     //        sum += parseInt(e[i])
-                     //     }
-                     //     if (i >= denStart) {
-                     //        den += parseInt(e[i])
-                     //     }
-                     //  }
-                     //  console.log('numerator', sum)
-                     //  console.log('denominator', den)
-                     //  if (den > 0) {
-                     //     let sumPct = ((100 * sum) / den).toFixed(1)
-                     //     if (field.type === 'percent') newArr.push(`${sumPct}%`)
-                     //     else {
-                     //        newArr.push(
-                     //           `${parseInt(sum).toLocaleString()} (${sumPct}%)`
-                     //        )
-                     //     }
-                     //  }
                      while (fieldCount) {
-                         console.log ( fieldCount, fieldOffset, e[fieldOffset])
                         if (fieldOffset <= numEnd) {
                            sum += parseInt(e[fieldOffset])
                         }
@@ -468,15 +445,6 @@ class Report {
                         }
                      } else newArr.push('n/a')
                      fieldOffset--
-                     //  if (parseInt(e[fieldOffset])) {
-                     //     let sumPct = ((100 * sum) / e[fieldOffset]).toFixed(1)
-                     //     if (field.type === 'percent') newArr.push(`${sumPct}%`)
-                     //     else {
-                     //        newArr.push(
-                     //           `${parseInt(sum).toLocaleString()} (${sumPct}%)`
-                     //        )
-                     //     }
-                     //  } else newArr.push('n/a')
                   } else if (field.type === 'sum') {
                      // in this case this._fields.code will have multiple comma separated entries.
                      let sum = 0
