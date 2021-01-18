@@ -412,17 +412,13 @@ class Report {
                      denStart = fieldCount // denominator is the last field
                   }
                }
-               console.log ( sumEnd, denStart )
-               console.log ( 'sum:', sum, 'denom:', den )
                for (let i = 1; i <= fieldCount; i++) {
-                   console.log ( 'i:', i, 'e[i]:', e[i] )
                   if (sumEnd >= i) {
                      sum += parseInt(e[i])
                   }
                   if (denStart <= i) {
                      den += parseInt(e[i])
                   }
-                  console.log ( 'sum:', sum, 'denom:', den )
                }
 
                if (field.type === 'number' || field.type === 'decimal' || field.type === 'sum') {
