@@ -373,6 +373,7 @@ class Report {
       let resultTable = []
       let offset = 0
       if (this._isTrend) {
+         console.log(this._results)
          let lastType = ''
          this._results.forEach((qry) => {
             if (lastType != qry.type) {
@@ -391,11 +392,53 @@ class Report {
                // e is a row (array) of result data.
                // tag the results with field types, and we might have a percent to process, which uses two fields
                // +== in the future, we could have a percent with a multi-code numerator, need to support that.
-               resultTable[index + offset].push(
-                  this._fields[0].type === 'percent'
-                     ? `${((100 * e[1]) / e[2]).toFixed(1)}%`
-                     : parseInt(e[1]).toLocaleString()
-               )
+
+               // for trend reports, we essentially have only one column to build, so all data that is not the first or last two columns is fair game.
+               const field = this._fields[0]
+               let res = ''
+               let sum = 0
+               let den = 0
+               let fieldCount = e.length - 3
+               // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
+               let sumEnd = fieldCount
+               let denStart = 1
+               if (field.type === 'percent' || field.type === 'sumPct') {
+                  // we're calucating a pct of some kind
+                  if ('numeratorCnt' in field) {
+                     numEnd = field.numeratorCnt // numerator is a fixed count of fields
+                     denStart = 1 // denominator is sum of all fields.
+                  } else {
+                     sumEnd = fieldCount - 1 // numerator is sum of all fields but last
+                     denStart = fieldCount // denominator is the last field
+                  }
+               }
+               console.log ( sumEnd, denStart )
+               console.log ( 'sum:', sum, 'denom:', den )
+               for (let i = 1; i <= fieldCount; i++) {
+                   console.log ( 'i:', i, 'e[i]:', e[i] )
+                  if (sumEnd >= i) {
+                     sum += parseInt(e[i])
+                  }
+                  if (denStart <= i) {
+                     den += parseInt(e[i])
+                  }
+                  console.log ( 'sum:', sum, 'denom:', den )
+               }
+
+               if (field.type === 'number' || field.type === 'decimal' || field.type === 'sum') {
+                  res = sum.toLocaleString()
+               } else if (den > 0) {
+                  const sumPct = ((100 * sum) / den).toFixed(1)
+                  if (field.type === 'percent') {
+                     res = sumPct
+                  } else if (field.type === 'sumPct') {
+                     res = `${parseInt(sum).toLocaleString()} (${sumPct}%)`
+                  }
+               } else {
+                  res = 'n/a'
+               }
+
+               resultTable[index + offset].push(res)
             })
          })
       } else {

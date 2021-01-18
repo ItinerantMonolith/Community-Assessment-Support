@@ -322,4 +322,40 @@ const REPORTS = [
       ],
       isTrend: false,
    },
+   {
+      name: 'Children Under Age 5, Child Poverty by Geographic Area',
+      fields: [
+         {
+            name: 'Child Poverty (0-18)',
+            code:
+               'B17001_004E,B17001_005E,B17001_006E,B17001_007E,B17001_008E,B17001_009E,B17001_018E,B17001_019E,B17001_020E,B17001_021E,B17001_022E,B17001_023E,B17001_033E,B17001_034E,B17001_035E,B17001_036E,B17001_037E,B17001_038E,B17001_047E,B17001_048E,B17001_049E,B17001_050E,B17001_051E,B17001_052E',
+            type: 'percent',
+            numeratorCnt: 12,
+         },
+         {
+            name: 'Poverty Rate for Children <5 Years Old',
+            code: 'B17001_004E,B17001_018E,B17001_033E,B17001_047E',
+            type: 'percent',
+            numeratorCnt: 2,
+         },
+         {
+            name: 'Number of Children <5 Years Old',
+            code: 'B17001_004E,B17001_018E,B17001_033E,B17001_047E',
+            type: 'sum',
+         },
+         {
+            name: 'Number of Children <5 Years Old Living in Poverty',
+            code: 'B17001_004E,B17001_018E',
+            type: 'sum',
+         },
+      ],
+      isTrend: false,
+   },
+   {
+      name: 'Number of Children <5 Years Old Living in Poverty',
+      fields: [
+         { name: 'Population', code: 'B17001_004E,B17001_018E', type: 'sum' },
+      ],
+      isTrend: true,
+   },
 ]
