@@ -402,6 +402,7 @@ class Report {
                   qry.year >= 2019 && qry.type !== 'zstate'
                      ? e.length - 3
                      : e.length - 2
+                console.log ( 'fieldCount', fieldCount)
                // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
                let sumEnd = fieldCount
                let denStart = 1
