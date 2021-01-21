@@ -391,7 +391,6 @@ class Report {
                // e is a row (array) of result data.
                // tag the results with field types, and we might have a percent to process, which uses two fields
 
-               console.log ( e )
                // for trend reports, we essentially have only one column to build, so all data that is not the first or last two columns is fair game.
                const field = this._fields[0]
                let res = ''
@@ -399,10 +398,10 @@ class Report {
                let den = 0
                // the api changed behavior between 2018 adn 2019 to include the
                let fieldCount =
-                  qry.year >= 2019 && qry.type !== 'zstate'
-                     ? e.length - 3
-                     : e.length - 2
-                console.log ( 'fieldCount', fieldCount)
+                  (qry.year < 2019 && qry.type === 'zip') ||
+                  qry.type === 'zstate'
+                     ? e.length - 2
+                     : e.length - 3
                // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
                let sumEnd = fieldCount
                let denStart = 1
