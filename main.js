@@ -391,6 +391,7 @@ class Report {
                // e is a row (array) of result data.
                // tag the results with field types, and we might have a percent to process, which uses two fields
 
+               console.log ( e )
                // for trend reports, we essentially have only one column to build, so all data that is not the first or last two columns is fair game.
                const field = this._fields[0]
                let res = ''
