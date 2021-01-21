@@ -373,7 +373,6 @@ class Report {
       let resultTable = []
       let offset = 0
       if (this._isTrend) {
-         console.log(this._results)
          let lastType = ''
          this._results.forEach((qry) => {
             if (lastType != qry.type) {
@@ -387,18 +386,21 @@ class Report {
 
                lastType = qry.type
             }
-
+            // +== this is irrellevent from a prev version...data is an array with an array in it, we don't need to iterate.
             qry.data.forEach((e, index) => {
                // e is a row (array) of result data.
                // tag the results with field types, and we might have a percent to process, which uses two fields
-               // +== in the future, we could have a percent with a multi-code numerator, need to support that.
 
                // for trend reports, we essentially have only one column to build, so all data that is not the first or last two columns is fair game.
                const field = this._fields[0]
                let res = ''
                let sum = 0
                let den = 0
-               let fieldCount = e.length - 3
+               // the api changed behavior between 2018 adn 2019 to include the
+               let fieldCount =
+                  qry.year >= 2019 && qry.type !== 'zstate'
+                     ? e.length - 3
+                     : e.length - 2
                // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
                let sumEnd = fieldCount
                let denStart = 1
@@ -420,8 +422,11 @@ class Report {
                      den += parseInt(e[i])
                   }
                }
-
-               if (field.type === 'number' || field.type === 'decimal' || field.type === 'sum') {
+               if (
+                  field.type === 'number' ||
+                  field.type === 'decimal' ||
+                  field.type === 'sum'
+               ) {
                   res = sum.toLocaleString()
                } else if (den > 0) {
                   const sumPct = ((100 * sum) / den).toFixed(1)
