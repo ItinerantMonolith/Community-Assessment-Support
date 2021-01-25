@@ -358,4 +358,45 @@ const REPORTS = [
       ],
       isTrend: true,
    },
+   {
+      name: 'Education Attainment (Age 25 and over)',
+      fields: [
+         {
+            name: 'Less Than 9th Grade',
+            code: 'B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_001E',
+            type: 'percent',
+         },
+         {
+            name: '9th to 12th Grade, no diploma',
+            code: 'B15003_013E,B15003_014E,B15003_015E,B15003_016E,B15003_001E',
+            type: 'percent',
+         },
+         {
+            name: 'High school graduate',
+            code: 'B15003_017E,B15003_018E,B15003_001E',
+            type: 'percent',
+         },
+         {
+            name: 'Some college, no degree',
+            code: 'B15003_019E,B15003_020E,B15003_001E',
+            type: 'percent',
+         },
+         {
+            name: "Associate's degree",
+            code: 'B15003_021E,B15003_001E',
+            type: 'percent',
+         },
+         {
+            name: "Bachelor's degree",
+            code: 'B15003_022E,B15003_001E',
+            type: 'percent',
+         },
+         {
+            name: 'Advanced degree',
+            code: 'B15003_023E,B15003_024E,B15003_025E,B15003_001E',
+            type: 'percent',
+         },
+      ],
+      isTrend: false,
+   },
 ]
