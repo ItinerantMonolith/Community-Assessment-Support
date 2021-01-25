@@ -124,8 +124,15 @@ const setupGeoFilters = () => {
       )
    })
 
+   const textZip = document.getElementById('textZip')
+   document.getElementById('textZip').addEventListener('keyup', (e) => {
+      if (event.key === 'Enter') {
+         if (textZip.value != '') validateZip(textZip.value)
+      }
+   })
+
    document.getElementById('btnZip').addEventListener('click', () => {
-      const textZip = document.getElementById('textZip')
+      //   const textZip = document.getElementById('textZip')
       if (textZip.value != '') validateZip(textZip.value)
    })
 }
@@ -502,7 +509,9 @@ class Report {
                   } else if (field.type === 'number')
                      newArr.push(parseInt(e[fieldOffset]).toLocaleString())
                   else if (field.type === 'dollars')
-                     newArr.push(`$${parseInt(e[fieldOffset]).toLocaleString()}`)
+                     newArr.push(
+                        `$${parseInt(e[fieldOffset]).toLocaleString()}`
+                     )
                   else if (field.type === 'decimal')
                      newArr.push(
                         parseFloat(e[fieldOffset]).toFixed(1).toLocaleString()

@@ -419,8 +419,30 @@ const REPORTS_RAW = [
             type: 'dollars',
          },
       ],
-      isTrend: false
+      isTrend: false,
+   },
+   {
+      name: 'Housing Characteristics',
+      fields: [
+         {
+            name: 'Rental Vacancy Rate',
+            code: 'B25004_002E,B25004_003E,B25003_003E',
+            type: 'percent',
+            numeratorCnt: 1,
+         },
+         //  {
+         //     name: 'Households Spending 30% or More or Monthly Income on Rent',
+         //     code: '',
+         //     type: 'percent',
+         //  },
+         //  {
+         //     name: 'Percent of Households with No Vehicle Available',
+         //     code: '',
+         //     type: 'percent',
+         //  },
+      ],
+      isTrend: false,
    },
 ]
 
-const REPORTS = REPORTS_RAW.sort( (a,b) => a.name < b.name ? -1 : 1 )
+const REPORTS = REPORTS_RAW.sort((a, b) => (a.name < b.name ? -1 : 1))
