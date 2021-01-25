@@ -435,11 +435,27 @@ const REPORTS_RAW = [
          //     code: '',
          //     type: 'percent',
          //  },
-         //  {
-         //     name: 'Percent of Households with No Vehicle Available',
-         //     code: '',
-         //     type: 'percent',
-         //  },
+         {
+            name: 'Percent of Households with No Vehicle Available',
+            code: 'B25044_003E,B25044_010E,B25044_001E',
+            type: 'percent',
+         },
+      ],
+      isTrend: false,
+   },
+   {
+      name: 'Percent of Population in Labor Force by Subgroup and Geography',
+      fields: [
+         {
+            name: 'Population Age 16+',
+            code: 'B23025_002E,B23025_001E',
+            type: 'percent',
+         },
+         {
+             name: 'Households with Children Under Age 6, All Parents in Family in Labor Force',
+             code: 'B23008_004E,B23008_010E,B23008_013E,B23008_002E',
+             type: 'percent'
+         }
       ],
       isTrend: false,
    },
