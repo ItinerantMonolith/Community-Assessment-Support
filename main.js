@@ -424,9 +424,7 @@ class Report {
                   }
                }
                if (
-                  field.type === 'number' ||
-                  field.type === 'decimal' ||
-                  field.type === 'sum'
+                  ['number', 'dollars', 'decimal', 'sum'].includes(field.type)
                ) {
                   res = sum.toLocaleString()
                } else if (den > 0) {
@@ -503,6 +501,8 @@ class Report {
                      newArr.push(parseInt(sum).toLocaleString())
                   } else if (field.type === 'number')
                      newArr.push(parseInt(e[fieldOffset]).toLocaleString())
+                  else if (field.type === 'dollars')
+                     newArr.push(`$${parseInt(e[fieldOffset]).toLocaleString()}`)
                   else if (field.type === 'decimal')
                      newArr.push(
                         parseFloat(e[fieldOffset]).toFixed(1).toLocaleString()

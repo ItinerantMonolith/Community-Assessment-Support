@@ -20,8 +20,8 @@ const STATES = [
    { name: 'District of Columbia', id: '11' },
    { name: 'Florida', id: '12' },
    { name: 'Georgia', id: '13' },
-   { name: 'Idaho', id: '16' },
    { name: 'Hawaii', id: '15' },
+   { name: 'Idaho', id: '16' },
    { name: 'Illinois', id: '17' },
    { name: 'Indiana', id: '18' },
    { name: 'Iowa', id: '19' },
@@ -63,7 +63,7 @@ const STATES = [
    { name: 'Puerto Rico', id: '72' },
 ]
 
-const REPORTS = [
+const REPORTS_RAW = [
    {
       name: 'Population by Geographic Area and Year',
       fields: [{ name: 'Population', code: 'B01003_001E', type: 'number' }],
@@ -363,7 +363,8 @@ const REPORTS = [
       fields: [
          {
             name: 'Less Than 9th Grade',
-            code: 'B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_001E',
+            code:
+               'B15003_002E,B15003_003E,B15003_004E,B15003_005E,B15003_006E,B15003_007E,B15003_008E,B15003_009E,B15003_010E,B15003_011E,B15003_012E,B15003_001E',
             type: 'percent',
          },
          {
@@ -399,4 +400,27 @@ const REPORTS = [
       ],
       isTrend: false,
    },
+   {
+      name: 'Median Home Value and Costs by Geographic Area',
+      fields: [
+         {
+            name: 'Median Home Value',
+            code: 'B25077_001E',
+            type: 'dollars',
+         },
+         {
+            name: 'Median Owner Costs',
+            code: 'B25088_002E',
+            type: 'dollars',
+         },
+         {
+            name: 'Median Rent',
+            code: 'B25064_001E',
+            type: 'dollars',
+         },
+      ],
+      isTrend: false
+   },
 ]
+
+const REPORTS = REPORTS_RAW.sort( (a,b) => a.name < b.name ? -1 : 1 )
