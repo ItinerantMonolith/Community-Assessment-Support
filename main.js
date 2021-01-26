@@ -461,7 +461,7 @@ class Report {
                this._fields.forEach((field) => {
                   fieldOffset++
                   // deal with percentage here.
-                  if (field.type === 'percent' || field.type === 'sumPct') {
+                  if ( ['percent', 'sumPct', 'decCalc'].includes(field.type) ) {
                      //  this._fields.code will have multiple comma separated entries,
                      // the default behavior for percentages (if numeratorCnt is not defined) is that the last is the divisor, all others should be totaled for the numerator
                      // if numeratorCnt exists, then the first numeratorCnt values are totaled for the numerator and ALL values are totalled for the denominator
@@ -487,11 +487,16 @@ class Report {
                      // if the denominator is 0, we don't want to show anything.
                      if (den > 0) {
                         let sumPct = ((100 * sum) / den).toFixed(1)
-                        if (field.type === 'percent') newArr.push(`${sumPct}%`)
-                        else {
+                        if (field.type === 'percent') {
+                            newArr.push(`${sumPct}%`)
+                        }
+                        else if (field.type === 'sumPct') {
                            newArr.push(
                               `${parseInt(sum).toLocaleString()} (${sumPct}%)`
                            )
+                        }
+                        else {  // decCalc
+                            newArr.push((sumPct/100).toFixed(1).toLocaleString())
                         }
                      } else newArr.push('n/a')
                      fieldOffset--

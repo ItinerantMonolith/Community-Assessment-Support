@@ -6,8 +6,9 @@ const typeDisplay = {
     sum: 'Total: all data elements are added together',
     sumPct: 'Percentage: data elements are totalled and divided by the overall Total',
     string: 'String',
+    decCalc: 'Decimal: data elements are totalled and divided by the overall total',
     decimal: 'Number with a single decimal point',
-    dollars: 'Number with a preceding $'
+    dollars: 'Number with a preceding $',
     }
 
 const clearHeaders = () => {

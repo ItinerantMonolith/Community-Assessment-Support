@@ -514,18 +514,18 @@ const REPORTS_RAW = [
            }
        ],
        isTrend: false
+   },
+   {
+       name: 'Mean Travel Time to Work',
+       fields: [
+           { 
+               name: 'Minutes',
+               code: 'B08013_001E,B08011_001E',
+               type: 'decCalc'
+           }
+       ],
+       isTrend: false
    }
-//    {
-//        name: 'Mean Travel Time to Work',
-//        fields: [
-//            { 
-//                name: 'Minutes',
-//                code: '',
-//                type: 'decimal'
-//            }
-//        ],
-//        isTrend: false
-//    }
 ]
 
 const REPORTS = REPORTS_RAW.sort((a, b) => (a.name < b.name ? -1 : 1))
