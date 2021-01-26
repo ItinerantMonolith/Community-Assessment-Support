@@ -459,6 +459,73 @@ const REPORTS_RAW = [
       ],
       isTrend: false,
    },
+   {
+       name: 'Number of Employed Individuals (Age 16+) and Percentage of the Employed Workforce by Class of Worker and Geographic Area',
+       fields: [
+           {
+               name: 'Private wage and salary workders',
+               code: 'B24080_003E,B24080_006E,B24080_013E,B24080_016E,B24080_001E',
+               type: 'sumPct'
+           },
+           {
+               name: 'Government Workders',
+               code: 'B24080_007E,B24080_008E,B24080_009E,B24080_017E,B24080_018E,B24080_019E,B24080_001E',
+               type: 'sumPct'
+           },
+           {
+            name: 'Self-employed in own not incorporated business workers',
+            code: 'B24080_010E,B24080_020E,B24080_001E',
+            type: 'sumPct'
+        },
+        {
+            name: 'Unpaid family workders',
+            code: 'B24080_011E,B24080_021E,B24080_001E',
+            type: 'sumPct'
+        }       
+       ],
+       isTrend: false
+   },
+   {
+       name: 'Number of Employed Individuals (Age 16+) and Percentage of the Employed Workforce by Occupation and Geographic Area',
+       fields: [
+            {
+                name: 'Management, business, science, and arts occupations',
+                code: 'B24020_001E,B24020_002E',
+                // code: 'B24010_003E,B24010_154E',
+
+                type: 'sum'
+            },
+            {
+                name: 'Service occupations',
+                code: 'B24010_064E,B24010_215E',
+                type: 'sum'
+            },
+
+       ],
+       isTrend: false
+   },
+   {
+       name: 'Households with No Vehicle Available',
+       fields: [
+           {
+               name: 'Percent of Households with No Vehicle Available',
+               code: 'B25044_003E,B25044_010E,B25044_001E',
+               type: 'percent',
+           }
+       ],
+       isTrend: false
+   }
+//    {
+//        name: 'Mean Travel Time to Work',
+//        fields: [
+//            { 
+//                name: 'Minutes',
+//                code: '',
+//                type: 'decimal'
+//            }
+//        ],
+//        isTrend: false
+//    }
 ]
 
 const REPORTS = REPORTS_RAW.sort((a, b) => (a.name < b.name ? -1 : 1))
