@@ -492,8 +492,6 @@ const REPORTS_RAW = [
             {
                 name: 'Management, business, science, and arts occupations',
                 code: 'B24020_001E,B24020_002E',
-                // code: 'B24010_003E,B24010_154E',
-
                 type: 'sum'
             },
             {
@@ -524,6 +522,53 @@ const REPORTS_RAW = [
                code: 'B08013_001E,B08011_001E',
                type: 'decCalc'
            }
+       ],
+       isTrend: false
+   },
+   {
+       name: 'Median Household Income',
+       fields: [
+           {
+               name: 'Median Household Income',
+               code: 'B19013_001E',
+               type: 'dollars'
+           }
+       ],
+       isTrend: false
+   },
+   {
+       name: 'Transportation to Work by Geographic Area',
+       fields: [
+           {
+               name: 'Car, truck, or van - drove alone',
+               code: 'B08006_003E,B08006_001E',
+               type: 'percent'
+           },
+           {
+            name: 'Car, truck, or van - carpooled',
+            code: 'B08006_004E,B08006_001E',
+            type: 'percent'
+        },
+        {
+            name: 'Public Transportation',
+            code: 'B08006_008E,B08006_001E',
+            type: 'percent'
+        },
+        {
+            name: 'Walked',
+            code: 'B08006_015E,B08006_001E',
+            type: 'percent'
+        },
+        {
+            name: 'Other Means',
+            code: 'B08006_014E,B08006_016E,B08006_001E',
+            type: 'percent'
+        },
+        {
+            name: 'Worked from home',
+            code: 'B08006_017E,B08006_001E',
+            type: 'percent'
+        }
        ],
        isTrend: false
    }

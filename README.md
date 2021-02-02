@@ -7,7 +7,7 @@
 ### Using the American Community Survey (ACS) dataset from the Census Bureau, the user has access to over 24,000 data points.  This tool will grant access to predefined collections of data points, grouped by year and geographical area (state, community, and/or zip) and present them in appropriately formatted tables.  A user will be able to select one or more years of data, refine that by geographical area, and then select which from among the predefined reports they want to view. 
 
 ## Report Scope
-FFF routinely generates more than 20 reports from U.S. Census Bureau data to include in their Community Assessements.  The inital scope of this tool will implement 8 of these:
+FFF routinely generates more than 20 reports from U.S. Census Bureau data to include in their Community Assessements.  The inital scope of this tool was 8 reports, with additional reports added as they are identified by FFF and analyzed to ensure valid implementation is possible. Initial reports were:
 * Population by Geographic Area and Year
 * Median Age and Distribution of the Population by Geographic Area
 * Population (and Percentage of Population) by Race and Geographic Area
@@ -16,7 +16,7 @@ FFF routinely generates more than 20 reports from U.S. Census Bureau data to inc
 * Poverty Rate by Geographic Area and Year
 * Number (and percent) of Individuals Below Poverty Level by Race and Geographic Area
 * Foreign-Born Population by Geographic Area
-Additional reports may be added over time.
+
 
 ## U.S. Census Bureau API
 The Census Bureau API is defined by year, dataset, subset, and parameters which include specific field identifiers and geographic filters.
@@ -34,17 +34,6 @@ The returned result is json but formatted as an array of data arrays, with the f
     [ "Hernando County, Florida", "182696", "12", "053" ]
 ]
 ```
-
-## User Stories
-### As a User, I need to...
-1. ...be able to select one or more years from among the last 5 years (at least) from which to retrieve data. 
-2. ...be able to select one state from which to retrieve data
-3. ...be able to select one or more counties within the chosen state
-4. ...be able to select one or more zip codes within the chosen state.  This may be in addition to counties.
-5. ...be able to select one or more of the predefined reports to generate.
-6. ...be able to unselect specific elements of the request (geographic areas, reports) before requesting the reports.
-7. ...be able to see the results of all of the chosen reports from the selected year(s) and geographic area(s).
-8. ...be able to review the source of data for each report
 
 ## Tracking
 #### Task tracking will be on a kanban board at Trello: https://trello.com/b/hNTAwNWs
