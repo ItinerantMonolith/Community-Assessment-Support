@@ -486,23 +486,23 @@ const REPORTS_RAW = [
        ],
        isTrend: false
    },
-   {
-       name: 'Number of Employed Individuals (Age 16+) and Percentage of the Employed Workforce by Occupation and Geographic Area',
-       fields: [
-            {
-                name: 'Management, business, science, and arts occupations',
-                code: 'B24020_001E,B24020_002E',
-                type: 'sum'
-            },
-            {
-                name: 'Service occupations',
-                code: 'B24010_064E,B24010_215E',
-                type: 'sum'
-            },
+//    {
+//        name: 'Number of Employed Individuals (Age 16+) and Percentage of the Employed Workforce by Occupation and Geographic Area',
+//        fields: [
+//             {
+//                 name: 'Management, business, science, and arts occupations',
+//                 code: 'B24020_001E,B24020_002E',
+//                 type: 'sum'
+//             },
+//             {
+//                 name: 'Service occupations',
+//                 code: 'B24010_064E,B24010_215E',
+//                 type: 'sum'
+//             },
 
-       ],
-       isTrend: false
-   },
+//        ],
+//        isTrend: false
+//    },
    {
        name: 'Households with No Vehicle Available',
        fields: [
