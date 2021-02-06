@@ -84,27 +84,27 @@ const REPORTS_RAW = [
       name: 'Ethnicity as a Percentage of the Population by Geographic Area',
       fields: [
          {
-            name: 'Hispanic or Latio Origin (of any race)',
+            name: 'Hispanic or Latino Origin (of any race)',
             code: 'B03001_003E,B03001_001E',
             type: 'percent',
          },
          {
-            name: 'Hispanic or Latio Origin: Mexican',
+            name: 'Hispanic or Latino Origin: Mexican',
             code: 'B03001_004E,B03001_001E',
             type: 'percent',
          },
          {
-            name: 'Hispanic or Latio Origin: Puerto Rican',
+            name: 'Hispanic or Latino Origin: Puerto Rican',
             code: 'B03001_005E,B03001_001E',
             type: 'percent',
          },
          {
-            name: 'Hispanic or Latio Origin: Cuban',
+            name: 'Hispanic or Latino Origin: Cuban',
             code: 'B03001_006E,B03001_001E',
             type: 'percent',
          },
          {
-            name: 'Hispanic or Latio Origin: Other',
+            name: 'Hispanic or Latino Origin: Other',
             code: 'B03001_007E,B03001_008E,B03001_016E,B03001_027E,B03001_001E',
             type: 'percent',
          },
