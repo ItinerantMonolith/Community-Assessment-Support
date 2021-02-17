@@ -398,7 +398,6 @@ class Report {
 
                lastType = qry.type
             }
-            console.log('qry.data', qry.data)
             // each element in query.data will the a row of data for a geo area (state,zip, or county)
             qry.data.forEach((e, index) => {
                // e is a row (array) of result data.
