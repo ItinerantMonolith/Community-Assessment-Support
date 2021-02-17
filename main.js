@@ -344,12 +344,17 @@ class Report {
       results.forEach((resRow, index) => {
          resRow.forEach((e, index2) => {
             let newDiv = document.createElement('div')
-            if (index === 0) newDiv.className = 'divTableCell divTableHeader'
-            else if (index === results.length - 1) {
+            if (index === 0) {
+               newDiv.className = 'divTableCell divTableHeader'
+            } else if (index === results.length - 1) {
                newDiv.className = 'divTableCell divTableSummary'
-            } else newDiv.className = 'divTableCell'
+            } else {
+               newDiv.className = 'divTableCell'
+            }
 
-            if (index2 === 0) newDiv.classList.add('divTableFirst')
+            if (index2 === 0) {
+               newDiv.classList.add('divTableFirst')
+            }
 
             newDiv.innerText = e
 
@@ -393,56 +398,63 @@ class Report {
 
                lastType = qry.type
             }
-            // +== this is irrellevent from a prev version...data is an array with an array in it, we don't need to iterate.
+            console.log('qry.data', qry.data)
+            // each element in query.data will the a row of data for a geo area (state,zip, or county)
             qry.data.forEach((e, index) => {
                // e is a row (array) of result data.
                // tag the results with field types, and we might have a percent to process, which uses two fields
 
-               // for trend reports, we essentially have only one column to build, so all data that is not the first or last two columns is fair game.
-               const field = this._fields[0]
                let res = ''
-               let sum = 0
-               let den = 0
-               // the api changed behavior between 2018 adn 2019 to include the
-               let fieldCount =
-                  (qry.year < 2019 && qry.type === 'zip') ||
-                  qry.type === 'zstate'
-                     ? e.length - 2
-                     : e.length - 3
-               // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
-               let sumEnd = fieldCount
-               let denStart = 1
-               if (field.type === 'percent' || field.type === 'sumPct') {
-                  // we're calucating a pct of some kind
-                  if ('numeratorCnt' in field) {
-                     numEnd = field.numeratorCnt // numerator is a fixed count of fields
-                     denStart = 1 // denominator is sum of all fields.
-                  } else {
-                     sumEnd = fieldCount - 1 // numerator is sum of all fields but last
-                     denStart = fieldCount // denominator is the last field
-                  }
-               }
-               for (let i = 1; i <= fieldCount; i++) {
-                  if (sumEnd >= i) {
-                     sum += parseInt(e[i])
-                  }
-                  if (denStart <= i) {
-                     den += parseInt(e[i])
-                  }
-               }
-               if (
-                  ['number', 'dollars', 'decimal', 'sum'].includes(field.type)
-               ) {
-                  res = sum.toLocaleString()
-               } else if (den > 0) {
-                  const sumPct = ((100 * sum) / den).toFixed(1)
-                  if (field.type === 'percent') {
-                     res = sumPct
-                  } else if (field.type === 'sumPct') {
-                     res = `${parseInt(sum).toLocaleString()} (${sumPct}%)`
-                  }
+               if (e[0] === 'ERROR') {
+                  res = 'Error'
                } else {
-                  res = 'n/a'
+                  // for trend reports, we essentially have only one column to build, so all data that is not the first or last two columns is fair game.
+                  const field = this._fields[0]
+                  let sum = 0
+                  let den = 0
+                  // the api changed behavior between 2018 and 2019 to include the state
+                  let fieldCount =
+                     (qry.year < 2019 && qry.type === 'zip') ||
+                     qry.type === 'zstate'
+                        ? e.length - 2
+                        : e.length - 3
+                  // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
+                  let sumEnd = fieldCount
+                  let denStart = 1
+                  if (field.type === 'percent' || field.type === 'sumPct') {
+                     // we're calucating a pct of some kind
+                     if ('numeratorCnt' in field) {
+                        numEnd = field.numeratorCnt // numerator is a fixed count of fields
+                        denStart = 1 // denominator is sum of all fields.
+                     } else {
+                        sumEnd = fieldCount - 1 // numerator is sum of all fields but last
+                        denStart = fieldCount // denominator is the last field
+                     }
+                  }
+                  for (let i = 1; i <= fieldCount; i++) {
+                     if (sumEnd >= i) {
+                        sum += parseInt(e[i])
+                     }
+                     if (denStart <= i) {
+                        den += parseInt(e[i])
+                     }
+                  }
+                  if (
+                     ['number', 'dollars', 'decimal', 'sum'].includes(
+                        field.type
+                     )
+                  ) {
+                     res = sum.toLocaleString()
+                  } else if (den > 0) {
+                     const sumPct = ((100 * sum) / den).toFixed(1)
+                     if (field.type === 'percent') {
+                        res = sumPct
+                     } else if (field.type === 'sumPct') {
+                        res = `${parseInt(sum).toLocaleString()} (${sumPct}%)`
+                     }
+                  } else {
+                     res = 'n/a'
+                  }
                }
 
                resultTable[index + offset].push(res)
@@ -452,7 +464,7 @@ class Report {
          // non trend table
          // for the moment, assume simple data
          this._results.forEach((qry) => {
-            // e is a query result.  e.data is an array of arrays
+            // e is a query result.  e.data is an array of arrays, where each row is one geo are (state, zip, or county)
             qry.data.forEach((e) => {
                // in this case, lets walk them using the fields.
                // first value will be the geo name
@@ -475,7 +487,7 @@ class Report {
                         denStart = fieldOffset
                      }
                      if ('denominatorCnt' in field) {
-                         denStart = fieldCount - field.denominatorCnt
+                        denStart = fieldCount - field.denominatorCnt
                      }
                      while (fieldCount) {
                         if (fieldOffset <= numEnd) {
@@ -547,6 +559,7 @@ class Report {
 
       // build the geo filter string
       let geoString = '&for='
+      let geoFilterCount = 1
 
       if (filterType === 'zstate') {
          geoString = `&for=state:${this._state}`
@@ -564,9 +577,10 @@ class Report {
             // 'zip'
             geoString += 'zip%20code%20tabulation%20area:'
             whichFilters = this._zipFilters
-            useState = year >= 2019
+            useState = (year >= 2019 || year === 2017)
          }
          let isFirst = true
+         geoFilterCount = whichFilters.length
          whichFilters.forEach((e) => {
             geoString += `${isFirst ? '' : ','}${String(e.filterID)}`
             isFirst = false
@@ -593,10 +607,13 @@ class Report {
             )
 
          this._results.push({ type: filterType, year: year, data: respData })
-         this.processResults()
       } catch (error) {
-         console.log(`Error in requestData: ${error}`)
+         // create error record and insert it
+         this._results.push({ type: filterType, year: year, data: new Array(geoFilterCount).fill(['ERROR']) })
+
+         console.log(`Error in requestData: ${year} ${this._name} ${error}`)
       }
+      this.processResults()
    }
 
    runReports = () => {
