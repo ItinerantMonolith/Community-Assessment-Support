@@ -464,12 +464,12 @@ const REPORTS_RAW = [
        name: 'Number of Employed Individuals (Age 16+) and Percentage of the Employed Workforce by Class of Worker and Geographic Area',
        fields: [
            {
-               name: 'Private wage and salary workders',
+               name: 'Private wage and salary workers',
                code: 'B24080_003E,B24080_006E,B24080_013E,B24080_016E,B24080_001E',
                type: 'sumPct'
            },
            {
-               name: 'Government Workders',
+               name: 'Government Workers',
                code: 'B24080_007E,B24080_008E,B24080_009E,B24080_017E,B24080_018E,B24080_019E,B24080_001E',
                type: 'sumPct'
            },
@@ -479,7 +479,7 @@ const REPORTS_RAW = [
             type: 'sumPct'
         },
         {
-            name: 'Unpaid family workders',
+            name: 'Unpaid family workers',
             code: 'B24080_011E,B24080_021E,B24080_001E',
             type: 'sumPct'
         }       
