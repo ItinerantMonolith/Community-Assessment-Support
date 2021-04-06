@@ -411,9 +411,8 @@ class Report {
                   const field = this._fields[0]
                   let sum = 0
                   let den = 0
-                  // the api changed behavior between 2018 and 2019 to include the state
+
                   let fieldCount =
-                     (qry.year < 2019 && qry.type === 'zip') ||
                      qry.type === 'zstate'
                         ? e.length - 2
                         : e.length - 3
@@ -563,7 +562,6 @@ class Report {
       if (filterType === 'zstate') {
          geoString = `&for=state:${this._state}`
       } else {
-         let useState = true
          let whichFilters = null
          let stateString = ''
          stateString = `&in=state:${this._state}`
@@ -576,7 +574,6 @@ class Report {
             // 'zip'
             geoString += 'zip%20code%20tabulation%20area:'
             whichFilters = this._zipFilters
-            useState = (year >= 2019 || year === 2017)
          }
          let isFirst = true
          geoFilterCount = whichFilters.length
@@ -584,7 +581,7 @@ class Report {
             geoString += `${isFirst ? '' : ','}${String(e.filterID)}`
             isFirst = false
          })
-         if (useState) geoString += stateString
+         geoString += `&in=state:${this._state}`
       }
 
       // for any year pre-2019, we need just zips.
