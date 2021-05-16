@@ -441,13 +441,7 @@ const REPORTS_RAW = [
             code: 'B25070_008E,B25070_009E,B25070_010E,B25070_002E,B25070_003E,B25070_004E,B25070_005E,B25070_006E,B25070_007E',
             type: 'percent',
             numeratorCnt: 3,
-         },
-
-         {
-            name: 'Percent of Households with No Vehicle Available',
-            code: 'B25044_003E,B25044_010E,B25044_001E',
-            type: 'percent',
-         },
+         }
       ],
       isTrend: false,
    },
