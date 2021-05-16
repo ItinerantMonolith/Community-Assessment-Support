@@ -431,11 +431,18 @@ const REPORTS_RAW = [
             numeratorCnt: 1,
          },
           {
-             name: 'Households Spending 30% or More or Monthly Income on Rent',
+             name: 'Households Spending 30% to 34.9% Monthly Income on Rent',
              code: 'B25070_007E,B25070_008E,B25070_009E,B25070_010E,B25070_002E,B25070_003E,B25070_004E,B25070_005E,B25070_006E',
              type: 'percent',
-             numeratorCnt: 4,
+             numeratorCnt: 1,
           },
+          {
+            name: 'Households Spending 35% or More or Monthly Income on Rent',
+            code: 'B25070_008E,B25070_009E,B25070_010E,B25070_002E,B25070_003E,B25070_004E,B25070_005E,B25070_006E,B25070_007E',
+            type: 'percent',
+            numeratorCnt: 3,
+         },
+
          {
             name: 'Percent of Households with No Vehicle Available',
             code: 'B25044_003E,B25044_010E,B25044_001E',
