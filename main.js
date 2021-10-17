@@ -4,6 +4,10 @@ let recentYear = 0 // this will get set to the most recent year we have availabl
 let reportTypeTrend = false
 
 const selectCounty = document.getElementById('selectCounty')
+// const selectCountyForSub = document.getElementById('selectCountyForSub')
+const selectCountySubdivision = document.getElementById('selectCountySubdivision')
+const chkSubdivision = document.getElementById('chkSubdivision');
+const selectZip = document.getElementById('selectZip');
 
 const setupReportSelection = async () => {
    // we want to get the 5 most recent available years, so we really just need to find the most recent and take that and the preceding 4.
@@ -30,6 +34,7 @@ const setupReportSelection = async () => {
 
    // now that we know the recent year, we can refresh counties, which needs a year  before it can make the request.
    refreshCounties(document.getElementById('selectState').value)
+   refreshZips (document.getElementById('selectState').value)
 
    // now populate our reportType selector
    const reportSelectType = document.getElementById('selectReportType')
@@ -67,15 +72,13 @@ const setupReportSelection = async () => {
    })
 
    // handlers for the generate and clear reports buttons
-   document
-      .getElementById('btnGenerate')
-      .addEventListener('click', generateReports)
+   document.getElementById('btnGenerate').addEventListener('click', generateReports)
 
    document.getElementById('btnClear').addEventListener('click', (e) => {
       const divReportDisplay = document.getElementById('divReportDisplay')
       while (divReportDisplay.children.length)
          divReportDisplay.lastChild.remove()
-      reportList.clearList()
+      // reportList.clearList()
       enableCopyButton(false)
    })
 
@@ -105,9 +108,10 @@ const setupGeoFilters = () => {
 
    const selectState = document.getElementById('selectState')
 
-   selectState.addEventListener('change', (e) =>
-      refreshCounties(e.target.value)
-   )
+   selectState.addEventListener('change', (e) => {
+      refreshCounties(e.target.value);
+      refreshZips( e.target.value );
+   });
 
    STATES.forEach((e) => {
       let newState = document.createElement('option')
@@ -117,24 +121,119 @@ const setupGeoFilters = () => {
    })
    selectState.selectedIndex = 0
 
-   document.getElementById('selectCounty').addEventListener('change', () => {
+   selectCounty.addEventListener('change', () => {
+      countySubList.clearList();
+      if ( chkSubdivision.checked ) {
+         countyList.clearList();
+         refreshSubdivisions( selectState.value, selectCounty.value );
+      }
       countyList.addFilter(
          selectCounty.options[selectCounty.selectedIndex].innerText,
          selectCounty.value
+         )
+   })
+
+   chkSubdivision.addEventListener('change', () => {
+      console.log ( chkSubdivision.checked) 
+      if ( chkSubdivision.checked ) {
+         selectCountySubdivision.classList.remove('hideDiv');
+         document.getElementById('countyList').style.display='none';
+         document.getElementById('countySubList').style.display='block';
+      }
+      else {
+         selectCountySubdivision.classList.add('hideDiv');
+         document.getElementById('countyList').style.display='block';
+         document.getElementById('countySubList').style.display='none';
+      }
+      countyList.clearList();
+      if ( selectCounty.selectedIndex != -1 ) {
+         countyList.addFilter(
+            selectCounty.options[selectCounty.selectedIndex].innerText,
+            selectCounty.value)
+         refreshSubdivisions( selectState.value, selectCounty.value );
+      }
+   });
+
+   selectCountySubdivision.addEventListener('change', () => {
+      countySubList.addFilter(
+         selectCountySubdivision.options[selectCountySubdivision.selectedIndex].innerText,
+         [ selectCounty.value, selectCountySubdivision.value ]
       )
    })
 
-   const textZip = document.getElementById('textZip')
-   document.getElementById('textZip').addEventListener('keyup', (e) => {
-      if (event.key === 'Enter') {
-         if (textZip.value != '') validateZip(textZip.value)
-      }
+   selectZip.addEventListener('change', () => {
+      zipList.addFilter ( 
+         selectZip.value, selectZip.value
+      )
    })
 
-   document.getElementById('btnZip').addEventListener('click', () => {
-      //   const textZip = document.getElementById('textZip')
-      if (textZip.value != '') validateZip(textZip.value)
-   })
+   // const textZip = document.getElementById('textZip')
+   // document.getElementById('textZip').addEventListener('keyup', (e) => {
+   //    if (event.key === 'Enter') {
+   //       if (textZip.value != '') validateZip(textZip.value)
+   //    }
+   // })
+
+   // document.getElementById('btnZip').addEventListener('click', () => {
+   //    //   const textZip = document.getElementById('textZip')
+   //    if (textZip.value != '') validateZip(textZip.value)
+   // })
+}
+
+
+const refreshSubdivisions = async ( state, county ) => {
+   let urlZip = `${CB_BASE_URL}${recentYear}${CB_DATASET}NAME&for=county%20subdivision:*&in=state:${state}+county:${county}${CB_API_KEY}`
+   try {
+      let resp = await axios.get(urlZip)
+      // clear the list
+      selectCountySubdivision.length = 0
+
+      // result will be an array with each element in the form
+      // [ name, stateID, countyID, subdivisionID ]
+      // ex: [ "Dover town, Morris County, New Jersey", "34", "027", "18070" ]
+      let mySub = resp.data
+      mySub.shift() // first item returned is the header row, so remove it
+      mySub.sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      mySub.forEach((e, i) => {
+         let newSub = document.createElement('option')
+         newSub.innerText = e[0].substring(0, e[0].indexOf(','))
+         newSub.value = e[3]
+         selectCountySubdivision.add(newSub)
+      })
+   } catch (error) {
+      console.log(`Error trying to get Subdivisions. ${error}`)
+   }
+
+   selectCountySubdivision.selectedIndex = -1
+   countySubList.clearList()
+}
+
+
+const refreshZips = async ( state ) => {
+   let urlZip = `${CB_BASE_URL}${recentYear}${CB_DATASET}NAME&for=zip%20code%20tabulation%20area:*&in=state:${state}${CB_API_KEY}`
+   try {
+      let resp = await axios.get(urlZip)
+      // clear the list
+      selectZip.length = 0
+
+      // result will be an array with each element in the form
+      // [ name, stateID, countyID ]
+      // ex: [ "Falls Church city, Virginia", "51", "610" ]
+      let myZips = resp.data
+      myZips.shift() // first item returned is the header row, so remove it
+      myZips.sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      myZips.forEach((e, i) => {
+         let newZip = document.createElement('option')
+         newZip.innerText = e[0].substring( e[0].length - 5)
+         newZip.value = e[2]
+         selectZip.add(newZip)
+      })
+   } catch (error) {
+      console.log(`Error trying to get Zips. ${error}`)
+   }
+
+   selectZip.selectedIndex = -1
+   zipList.clearList()
 }
 
 const refreshCounties = async (state) => {
@@ -143,6 +242,7 @@ const refreshCounties = async (state) => {
       let resp = await axios.get(urlCounty)
       // clear the list
       selectCounty.length = 0
+      // selectCountyForSub.length = 0
 
       // result will be an array with each element in the form
       // [ name, stateID, countyID ]
@@ -162,7 +262,8 @@ const refreshCounties = async (state) => {
 
    selectCounty.selectedIndex = -1
    countyList.clearList()
-   zipList.clearList()
+   selectCountySubdivision.length=0;
+   countySubList.clearList()
 }
 
 const validateZip = async (zip) => {
@@ -188,11 +289,11 @@ const validateZip = async (zip) => {
 }
 
 class FilterList {
-   constructor(itemType, sortAsc = true) {
+   constructor(itemType, sortByVal = true) {
       this._itemType = itemType
       this._filterList = []
       this._divList = document.getElementById(`${this._itemType}List`)
-      this._sortAsc = sortAsc
+      this._sortByVal = sortByVal
    }
 
    get filterList() {
@@ -242,13 +343,13 @@ class FilterList {
       ) {
          this._filterList.push(newFilter)
          // sort the list for display
-         if (this._sortAsc)
+         if (this._sortByVal)
             this._filterList.sort(
                (a, b) => parseInt(a.filterID) - parseInt(b.filterID)
             )
          else
             this._filterList.sort(
-               (a, b) => parseInt(b.filterID) - parseInt(a.filterID)
+               (a, b) => a.name < b.name ? -1 : 1
             )
          this.updateDisplay()
       }
@@ -267,14 +368,19 @@ class Report {
       this._results = []
       this._resultCount = 0
       this._countyFilters = []
+      this._countySubFilters = []
       this._zipFilters = []
       this._state = document.getElementById('selectState').value
+      this._typeSort = { 'zip': 0, 'countySub': 1, 'county': 2, 'zstate': 3 };
    }
 
    addFilters = (filters, type) => {
-      if (type === 'county') this._countyFilters = filters
-      // an array of filter objects, of the form { name: , filterID: , type: [county|zip] }
-      else this._zipFilters = filters
+      if (type === 'county') 
+         this._countyFilters = filters
+      else if ( type === 'countySub')
+         this._countySubFilters = filters
+      else 
+         this._zipFilters = filters
    }
 
    headerRow = () => {
@@ -375,7 +481,7 @@ class Report {
             return a.year < b.year ? -1 : 1
          } else {
             // sort by type
-            return a.type < b.type ? -1 : 1
+            return this._typeSort[a.type] < this._typeSort[b.type] ? -1 : 1
          }
       })
 
@@ -570,18 +676,25 @@ class Report {
             geoString += 'county:'
             // counties must be 3 digits
             whichFilters = this._countyFilters
-         } else {
+         }
+         else if ( filterType === 'countySub' ) {
+            geoString += 'county%20subdivision:';
+            stateString += `+county:${this._countySubFilters[0].filterID[0]}`;
+            whichFilters = this._countySubFilters.map( x => { return { 'filterID': x.filterID[1] }; } );
+         } 
+         else {
             // 'zip'
             geoString += 'zip%20code%20tabulation%20area:'
             whichFilters = this._zipFilters
          }
-         let isFirst = true
+
          geoFilterCount = whichFilters.length
+         let isFirst = true;
          whichFilters.forEach((e) => {
             geoString += `${isFirst ? '' : ','}${String(e.filterID)}`
             isFirst = false
          })
-         geoString += `&in=state:${this._state}`
+         geoString += stateString
       }
 
       // for any year pre-2019, we need just zips.
@@ -620,10 +733,11 @@ class Report {
       this._results = []
       this._resultCount = 0
 
-      for (let fType of ['county', 'zip', 'zstate']) {
+      for (let fType of ['county', 'countySub', 'zip', 'zstate']) {
          if (
-            (fType === 'county' && this._countyFilters.length) ||
-            (fType === 'zip' && this._zipFilters.length) ||
+            ( fType === 'county' && this._countyFilters.length ) ||
+            ( fType === 'countySub' && this._countySubFilters.length ) ||
+            ( fType === 'zip' && this._zipFilters.length ) ||
             fType === 'zstate'
          ) {
             if (this._isTrend) {
@@ -657,7 +771,7 @@ const refreshReportSelection = () => {
 const checkGenerateButton = () => {
    // if we have no reports or we have no geo filters, we can't generate anything
    document.getElementById('btnGenerate').disabled =
-      (!countyList.hasFilters && !zipList.hasFilters) || !reportList.hasFilters
+      (!countyList.hasFilters && !countySubList.hasFilters && !zipList.hasFilters) || !reportList.hasFilters
 
    // the clear button should be active if we have reports selected in the filter or results generated
    document.getElementById('btnClear').disabled =
@@ -676,7 +790,10 @@ const generateReports = () => {
       let newReport = new Report(REPORTS[e.filterID])
       if (countyList.hasFilters)
          newReport.addFilters(countyList.filterList, 'county')
-      if (zipList.hasFilters) newReport.addFilters(zipList.filterList, 'zip')
+      if (zipList.hasFilters) 
+         newReport.addFilters(zipList.filterList, 'zip')
+      if ( countySubList.hasFilters )
+         newReport.addFilters(countySubList.filterList, 'countySub')
       reports.push(newReport)
    })
 
@@ -685,7 +802,8 @@ const generateReports = () => {
    enableCopyButton(true)
 }
 
-const countyList = new FilterList('county')
+const countyList = new FilterList('county', false)
+const countySubList = new FilterList('countySub', false);
 const zipList = new FilterList('zip')
 const reportList = new FilterList('report')
 

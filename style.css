@@ -97,6 +97,8 @@ main {
     min-height: 75vh;
 }
 
+.hideDiv { display: none }
+
 #mainDiv {
     min-height: 75vh;
 }
@@ -132,7 +134,7 @@ footer {
     margin: 30px auto;
 }
 
-#countyList, #zipList { 
+#countyList, #zipList, #countySubList { 
     margin: 3px auto;
     display: flex;
     flex-direction: column;
@@ -175,7 +177,7 @@ footer {
 }
 
 
-.countyItem, .zipItem {
+.countyItem, .zipItem, .countySubItem {
     margin: 3px 10px;
     background-color: var(--color5);
 }
@@ -312,3 +314,4 @@ footer {
 .dataTableHeader {
     font-weight: bold;
 }
+

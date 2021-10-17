@@ -26,12 +26,19 @@
             </div>
             <div class="divGeoFilter">
                 <label for="selectCounty">Select Counties</label><br>
-                <select id="selectCounty"></select>
+                <select id="selectCounty"></select><br>
+                <label for='chkSubdivision'>Show Subdivisions</label><input id='chkSubdivision' type='checkbox'><br>
                 <div id="countyList" class="selectedList"></div>
+                <select id="selectCountySubdivision" class="hideDiv"></select>
+                <div id="countySubList" class="selectedList"></div>
             </div>
+
+            
             <div class="divGeoFilter">
-                <label for="textZip">Select Zip Codes</label><br><input type="text" id="textZip">
-                <button id="btnZip">Add Zip</button>
+                <label for="textZip">Select Zip Codes</label><br>
+                <!-- <input type="text" id="textZip">
+                <button id="btnZip">Add Zip</button> -->
+                <select id="selectZip"></select>
                 <div id="zipList" class="selectedList"></div>
             </div>
         </div>
@@ -48,7 +55,7 @@
                     <div id="reportList" class="selectedList"></div>
                 </div>
                 <div id="divGenerateReports">
-                    <button id="btnGenerate">Generate Reports</button><button id="btnClear">Clear Reports</button>
+                    <button id="btnGenerate">Generate Reports</button><button id="btnClear">Clear Results</button>
                     <button id="btnCopy">Copy Reports to Clipboard</button>
                 </div>
             </div>
