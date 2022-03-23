@@ -693,7 +693,8 @@ class Report {
             // 'zip'
             geoString += 'zip%20code%20tabulation%20area:'
             whichFilters = this._zipFilters
-            stateString = ''  // as of 2020 ACS, zips no longer belong to states
+            if ( year >= 2020 )
+               stateString = ''  // as of 2020 ACS, zips no longer belong to states
          }
 
          geoFilterCount = whichFilters.length
