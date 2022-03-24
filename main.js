@@ -525,10 +525,9 @@ class Report {
                   let sum = 0
                   let den = 0
 
-                  let fieldCount =
-                     qry.type === 'zstate'
-                        ? e.length - 2
-                        : e.length - 3
+                  // this should be the number of elements in field.code
+                  let fieldCount = field.code.split(',').length
+
                   // default behavior should be for a 'number', or 'decimal', it should behave the same as a sum, but there will only be one data value
                   let sumEnd = fieldCount
                   let denStart = 1
