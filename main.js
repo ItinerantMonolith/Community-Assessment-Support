@@ -210,13 +210,14 @@ const refreshSubdivisions = async ( state, county ) => {
 
 
 const refreshZips = async ( state ) => {
-   // 2020 zips are not available by state, so we need a nasty little hack here for now...
-   if ( recentYear === 2020 )
+   // 2020 and 2021 zips are not available by state, so we need a nasty little hack here for now...
+   if ( recentYear > 2019 )
       zipYear = 2019
    else 
       zipYear = recentYear
 
    let urlZip = `${CB_BASE_URL}${zipYear}${CB_DATASET}NAME&for=zip%20code%20tabulation%20area:*&in=state:${state}${CB_API_KEY}`
+
    try {
       let resp = await axios.get(urlZip)
       // clear the list
