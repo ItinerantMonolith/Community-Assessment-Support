@@ -580,21 +580,27 @@ class Report {
       let resultTable = []
       let offset = 0
       if (this._isTrend) {
+         
          // problem with trend reports...now that we are pulling ASC1 data, we have the situation in which individual geo areas (zips, counties, etc) may not have acs1 
          // data.  if ONLY areas with no data are included, then one error row will be returned.  if there is a mix of areas with and without data, we'll end up with an 
          // error entry with too many entries because it's assuming that we get results back for every area requested.  So in this case we have to prune the error records.
          // iterate the records and find the smallest record for a non-state area
          let minSize = 999;
-         this._results.forEach( (e) => {
-            if ( ( e.type != 'zstate' ) && ( e.data.length < minSize ))
-               minSize = e.data.length
-         })
-         // now prune any that are too long
-         this._results.forEach( (e) => {
-            if ( e.type != 'zstate' ) 
-               while ( e.data.length > minSize )
-                  e.data.pop();
-         })
+         for (let fType of ['county', 'countySub', 'place', 'zip']) {
+            minSize = 999;
+            
+            this._results.forEach( (e) => {
+               if ( ( e.type === fType ) && ( e.data.length < minSize ))
+                  minSize = e.data.length
+            })
+            // now prune any that are too long
+            this._results.forEach( (e) => {
+               if ( e.type === fType ) 
+                  while ( e.data.length > minSize )
+                     e.data.pop();
+            })
+         }
+  
 
          let lastType = ''
          this._results.forEach((qry) => {
@@ -816,11 +822,13 @@ class Report {
          use_dataset = CB_DATASET_1;
 
       let myURL = `${CB_BASE_URL}${year}${use_dataset}${fieldString}${geoString}${CB_API_KEY}`
-      // console.log(myURL)
+      console.log(myURL)
       try {
          let response = await axios.get(myURL)
          let respData = response.data
-
+// console.log ('resp1:')
+// console.log ( respData[1] )
+         
          respData.shift() // remove the "header" row
          // now sort it
          respData.sort((a, b) => (a[0] < b[0] ? -1 : 1))
@@ -831,6 +839,9 @@ class Report {
                   (respData[index][0] = e[0].substring(0, e[0].indexOf(',')))
             )
 
+// console.log ('resp2:')
+// respData.forEach ( (e) => console.log (e ))
+// console.log ( respData )
          this._results.push({ type: filterType, year: year, data: respData })
       } catch (error) {
          // create error record and insert it
