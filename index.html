@@ -21,11 +21,12 @@
     <main>
         <div id="divSelectGeo" class="divSelect">
             <div id="divGeoHeader">
-                <label for="selectState">Select a State</label><br>
+                <h3><label for="selectState">Select a State</label></h3>
                 <select id="selectState"></select>
             </div>
+
             <div class="divGeoFilter">
-                <label for="selectCounty">Select Counties</label><br>
+                <h3><label for="selectCounty">Select Counties</label></h3>
                 <select id="selectCounty"></select><br>
                 <label for='chkSubdivision'>Show Subdivisions</label><input id='chkSubdivision' type='checkbox'><br>
                 <div id="countyList" class="selectedList"></div>
@@ -33,11 +34,15 @@
                 <div id="countySubList" class="selectedList"></div>
             </div>
 
-            
             <div class="divGeoFilter">
-                <label for="textZip">Select Zip Codes</label><br>
-                <!-- <input type="text" id="textZip">
-                <button id="btnZip">Add Zip</button> -->
+                <h3><label for="selectPlace">Select Places</label></h3>
+                <select id="selectPlace"></select>
+                <div id="placeList" class="selectedList"></div>
+            </div>
+
+
+            <div class="divGeoFilter">
+                <h3><label for="selectZip">Select Zip Codes</label></h3>
                 <select id="selectZip"></select>
                 <div id="zipList" class="selectedList"></div>
             </div>

@@ -134,7 +134,7 @@ footer {
     margin: 30px auto;
 }
 
-#countyList, #zipList, #countySubList { 
+#countyList, #placeList, #zipList, #countySubList { 
     margin: 3px auto;
     display: flex;
     flex-direction: column;
@@ -177,7 +177,7 @@ footer {
 }
 
 
-.countyItem, .zipItem, .countySubItem {
+.countyItem, .placeItem, .zipItem, .countySubItem {
     margin: 3px 10px;
     background-color: var(--color5);
 }
