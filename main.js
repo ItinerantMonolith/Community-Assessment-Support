@@ -576,7 +576,7 @@ class Report {
       // at this point, _results is sorted by type (county, place, zip, zState), year (only meaningful for _isTrend), and then the first field of the result, which should be the geo area.
       // if it's an _isTrend, we need to transpose the years into columns.
       // otherwise we basically have the report table.
-      
+       
       let resultTable = []
       let offset = 0
       if (this._isTrend) {
