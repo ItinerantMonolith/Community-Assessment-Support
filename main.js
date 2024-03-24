@@ -21,6 +21,7 @@ const setupReportSelection = async () => {
       let urlPop = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}B01003_001E&for=us${CB_API_KEY}`
       try {
          let resp = await axios.get(urlPop)
+         console.log(urlPop);
          lookAgain = false
       } catch (error) {
          recentYear--
@@ -58,9 +59,11 @@ const setupReportSelection = async () => {
    refreshPlaces ( document.getElementById('selectState').value )
    refreshZips ( document.getElementById('selectState').value )
 
+   refreshMetroMicro ( );
+
    // now populate our reportType selector
    const reportSelectType = document.getElementById('selectReportType')
-   for (i = 0; i < 5; i++) {
+   for (i = 0; i < 6; i++) {
       let newYear = document.createElement('option')
       newYear.innerText = `ACS 5 Year Estimate for ${String(recentYear - (i+4))} - ${String(recentYear - i)}`
       newYear.value = recentYear - i
@@ -105,6 +108,32 @@ const setupReportSelection = async () => {
       )
    })
 
+   // handler for the geo selection 
+   document.getElementById('selectGeoType').addEventListener('click', (e) => {
+      if ( e.target.selectedIndex === 0 )
+         setGeoDivs ('state');
+      else
+         setGeoDivs ('metro');
+   })
+
+   const setGeoDivs = (enableDiv) => {
+      document.getElementById('divStateGroup').style.display = ( enableDiv === 'state' ? 'block' : 'none' ) ;
+      document.getElementById('divMetroGroup').style.display = ( enableDiv === 'metro' ? 'block' : 'none' ) ;
+   
+      selectCounty.length=0;
+      countyList.clearList();
+      selectCountySubdivision.length = 0;
+      countySubList.clearList();
+      selectZip.length=0;
+      zipList.clearList();
+      selectPlace.length=0;
+      placeList.clearList();
+      selectMetro.selectedIndex = -1;
+      metroList.clearList();
+   }
+
+   setGeoDivs ('state');
+
    // handlers for the generate and clear reports buttons
    document.getElementById('btnGenerate').addEventListener('click', generateReports)
 
@@ -132,6 +161,7 @@ const setupReportSelection = async () => {
    })
    enableCopyButton(false)
 }
+
 
 const enableCopyButton = (enableFlag) => {
    document.getElementById('btnCopy').disabled = !enableFlag
@@ -205,6 +235,13 @@ const setupGeoFilters = () => {
    selectZip.addEventListener('change', () => {
       zipList.addFilter ( 
          selectZip.value, selectZip.value
+      )
+   })
+
+   selectMetro.addEventListener('change', () => {
+      console.log (selectMetro.options[selectMetro.selectedIndex].innerText, selectMetro.value)
+      metroList.addFilter (
+         selectMetro.options[selectMetro.selectedIndex].innerText, selectMetro.value
       )
    })
 
@@ -285,8 +322,41 @@ const refreshZips = async ( state ) => {
    zipList.clearList()
 }
 
+const refreshMetroMicro = async () => {
+   let urlMetro = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area${CB_API_KEY}`
+   // console.log ( urlMetro );
+   try {
+      let resp = await axios.get(urlMetro)
+      // clear the list
+      // create a metro list 
+      selectMetro.length = 0
+
+      // result will be an array with each element in the form
+      // [ name, stateID, countyID ]
+      // ex: [ "Falls Church city, Virginia", "51", "610" ]
+      let myMetro = resp.data
+      myMetro.shift() // first item returned is the header row, so remove it
+      myMetro.sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      myMetro.forEach((e, i) => {
+         let newMetro = document.createElement('option')
+         // newCounty.innerText = e[0].substring(0, e[0].indexOf(','))
+         newMetro.innerText = e[0]
+         newMetro.value = e[1]
+         selectMetro.add(newMetro)
+      })
+   } catch (error) {
+      console.log(`Error trying to get Metro/Micro areas. ${error}`)
+   }
+
+   selectMetro.selectedIndex = -1
+   metroList.clearList()
+}
+
+
+
 const refreshCounties = async (state) => {
    let urlCounty = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=county:*&in=state:${state}${CB_API_KEY}`
+   // console.log ( urlCounty );
    try {
       let resp = await axios.get(urlCounty)
       // clear the list
@@ -317,7 +387,7 @@ const refreshCounties = async (state) => {
 
 const refreshPlaces = async (state) => {
    let urlPlaces = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=place:*&in=state:${state}${CB_API_KEY}`
-// console.log ( urlPlaces);
+   // console.log ( urlPlaces);
    try {
       let resp = await axios.get(urlPlaces)
       // clear the list
@@ -449,6 +519,7 @@ class Report {
       this._countySubFilters = []
       this._placeFilters = []
       this._zipFilters = []
+      this._metroFilters = []
       this._state = document.getElementById('selectState').value
       this._typeSort = { 'zip': 0, 'place': 1, 'countySub': 2, 'county': 3, 'zstate': 4 };
    }
@@ -460,8 +531,10 @@ class Report {
          this._countySubFilters = filters
       else if ( type === 'place' )
          this._placeFilters = filters
-      else 
+      else if ( type === 'zip' )
          this._zipFilters = filters
+      else if ( type === 'metro' )
+         this._metroFilters = filters
    }
 
    headerRow = () => {
@@ -776,9 +849,19 @@ class Report {
       let geoString = '&for='
       let geoFilterCount = 1
 
-      if (filterType === 'zstate') {
+      if ( filterType === 'metro' ) {
+         geoString = '&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area:';
+         let isFirst = true;
+         this._metroFilters.forEach((e) => {
+            geoString += `${isFirst ? '' : ','}${String(e.filterID)}`
+            isFirst = false
+         })
+      
+      }
+      else if (filterType === 'zstate') {
          geoString = `&for=state:${this._state}`
-      } else {
+      } 
+      else {
          let whichFilters = null
          let stateString = ''
          stateString = `&in=state:${this._state}`
@@ -822,7 +905,7 @@ class Report {
          use_dataset = CB_DATASET_1;
 
       let myURL = `${CB_BASE_URL}${year}${use_dataset}${fieldString}${geoString}${CB_API_KEY}`
-      console.log(myURL)
+      // console.log(myURL)
       try {
          let response = await axios.get(myURL)
          let respData = response.data
@@ -861,13 +944,14 @@ class Report {
       this._results = []
       this._resultCount = 0
 
-      for (let fType of ['county', 'countySub', 'place', 'zip', 'zstate']) {
+      for (let fType of ['county', 'countySub', 'place', 'zip', 'zstate', 'metro']) {
          if (
             ( fType === 'county' && this._countyFilters.length ) ||
             ( fType === 'countySub' && this._countySubFilters.length ) ||
             ( fType === 'place' && this._placeFilters.length ) ||
             ( fType === 'zip' && this._zipFilters.length ) ||
-            fType === 'zstate'
+            ( fType === 'zstate' && !this._metroFilters.length ) ||
+            ( fType === 'metro' && this._metroFilters.length )
          ) {
             if (this._isTrend) {
                for (let i = 0; i < 5; i++)   {
@@ -906,7 +990,7 @@ const refreshReportSelection = () => {
 const checkGenerateButton = () => {
    // if we have no reports or we have no geo filters, we can't generate anything
    document.getElementById('btnGenerate').disabled =
-      (!countyList.hasFilters && !countySubList.hasFilters && !placeList.hasFilters && !zipList.hasFilters) || !reportList.hasFilters
+      (!countyList.hasFilters && !countySubList.hasFilters && !placeList.hasFilters && !zipList.hasFilters && !metroList.hasFilters) || !reportList.hasFilters
 
    // the clear button should be active if we have reports selected in the filter or results generated
    document.getElementById('btnClear').disabled =
@@ -932,6 +1016,9 @@ const generateReports = () => {
          newReport.addFilters(zipList.filterList, 'zip')
       if ( countySubList.hasFilters )
          newReport.addFilters(countySubList.filterList, 'countySub')
+      if ( metroList.hasFilters )
+         newReport.addFilters(metroList.filterList, 'metro')
+      
       reports.push(newReport)
    })
 
@@ -945,6 +1032,7 @@ const countySubList = new FilterList('countySub', false);
 const placeList = new FilterList('place', false)
 const zipList = new FilterList('zip')
 const reportList = new FilterList('report')
+const metroList = new FilterList('metro');
 
 window.onload = () => {
    setupGeoFilters()

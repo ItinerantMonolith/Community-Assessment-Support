@@ -177,7 +177,7 @@ footer {
 }
 
 
-.countyItem, .placeItem, .zipItem, .countySubItem {
+.countyItem, .placeItem, .zipItem, .countySubItem, .metroItem {
     margin: 3px 10px;
     background-color: var(--color5);
 }
@@ -197,7 +197,7 @@ footer {
     text-align: center;
 }
 
-#btnGenerate, #btnClear, #btnCopy {
+#btnGenerate, #btnClear, #btnCopy, #btnByState, #btnByMetro {
     padding: 5px 20px;
     border-radius: 5px;
     font-size: 20px;
