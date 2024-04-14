@@ -89,7 +89,7 @@ const displayReport = () => {
     tableDiv.appendChild( newTitle )
 
     const newType = document.createElement ( 'div' )
-    newType.innerHTML = `<em>${report.isTrend ? 'Trend Report (most recent 5 years)' : 'Single Year Report'}</em>`
+    newType.innerHTML = `<em>${report.isTrend ? 'Trend Report (most recent 6 years)' : 'Single Year Report'}</em>`
     newType.style.gridColumn =  `span ${report.fields.length}`
     tableDiv.appendChild( newType )
 

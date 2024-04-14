@@ -71,13 +71,13 @@ const setupReportSelection = async () => {
       reportSelectType.add(newYear)
    }
    let newReportType = document.createElement('option')
-   newReportType.innerText = 'Trend Reports of 5 most recent ACS 1 Year Estimates'
+   newReportType.innerText = 'Trend Reports of 6 most recent ACS 1 Year Estimates'
    newReportType.value = 'trend'
    newReportType.dataset.src = 'acs1';
    reportSelectType.add(newReportType)
 
    newReportType = document.createElement('option')
-   newReportType.innerText = 'Trend Reports of 5 most recent ACS 5 Year Estimates'
+   newReportType.innerText = 'Trend Reports of 6 most recent ACS 5 Year Estimates'
    newReportType.value = 'trend'
    newReportType.dataset.src = 'acs5';
    reportSelectType.add(newReportType)
@@ -541,9 +541,9 @@ class Report {
       let header = ['Geographic Area']
       if (this._isTrend) {
          if ( reportSrc === 'acs5' )
-            for (let i = 0; i < 5; i++) header.push(String(recentYear - (4 - i)))
+            for (let i = 0; i < 6; i++) header.push(String(recentYear - (5 - i)))
          else
-            for (let i = 0; i < 5; i++) header.push(String(recentYear1 - (4 - i)))   
+            for (let i = 0; i < 6; i++) header.push(String(recentYear1 - (5 - i)))   
       }
       else 
          this._fields.forEach((e) => header.push(e.name))
@@ -559,7 +559,7 @@ class Report {
       let titleRow = document.createElement('tr')
       let titleCell = document.createElement('td')
       if ( this._isTrend )
-      titleCell.innerText = this._name + ' (' + reportSrc.toUpperCase() + ')'
+         titleCell.innerText = this._name + ' (' + reportSrc.toUpperCase() + ')'
       else
          titleCell.innerText = this._name
       titleCell.colSpan = results[0].length
@@ -954,12 +954,12 @@ class Report {
             ( fType === 'metro' && this._metroFilters.length )
          ) {
             if (this._isTrend) {
-               for (let i = 0; i < 5; i++)   {
+               for (let i = 0; i < 6; i++)   {
 
                   if ( reportSrc === 'acs5' )
-                     this.requestData(fType, recentYear - (4 - i))
+                     this.requestData(fType, recentYear - (5 - i))
                   else
-                     this.requestData(fType, recentYear1 - (4 - i))
+                     this.requestData(fType, recentYear1 - (5 - i))
                }
             } else
                this.requestData(
