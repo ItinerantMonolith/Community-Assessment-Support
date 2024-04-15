@@ -730,13 +730,11 @@ class Report {
                         den += parseInt(e[i])
                      }
                   }
-                  if (
-                     ['number', 'dollars', 'decimal', 'sum'].includes(
-                        field.type
-                     )
-                  ) {
+                  if ( ['number', 'dollars', 'decimal', 'sum'].includes( field.type ) ) 
                      res = sum.toLocaleString()
-                  } else if (den > 0) {
+                  else if ( field.type === 'decimalPct' )
+                     res = `${sum.toLocaleString()}%`;
+                  else if (den > 0) {
                      const sumPct = ((100 * sum) / den).toFixed(1)
                      if (field.type === 'percent') {
                         res = sumPct
@@ -825,9 +823,9 @@ class Report {
                         `$${parseInt(e[fieldOffset]).toLocaleString()}`
                      )
                   else if (field.type === 'decimal')
-                     newArr.push(
-                        parseFloat(e[fieldOffset]).toFixed(1).toLocaleString()
-                     )
+                     newArr.push( parseFloat(e[fieldOffset]).toFixed(1).toLocaleString() )
+                  else if ( field.type === 'decimalPct' )
+                     newArr.push( `${parseFloat(e[fieldOffset]).toFixed(1).toLocaleString()}%` );
                   else newArr.push(e[fieldOffset])
                })
                resultTable.push(newArr)

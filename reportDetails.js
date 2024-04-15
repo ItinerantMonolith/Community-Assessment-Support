@@ -8,7 +8,8 @@ const typeDisplay = {
     string: 'String',
     decCalc: 'Decimal: data elements are totalled and divided by the overall total',
     decimal: 'Number with a single decimal point',
-    dollars: 'Number with a preceding $',
+    decimalPct: 'Number with a single decimal point, formatted as a percentage',
+    dollars: 'Number with a preceding $'
     }
 
 const clearHeaders = () => {

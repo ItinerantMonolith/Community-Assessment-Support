@@ -598,17 +598,17 @@ const REPORTS_RAW = [
          {
             name: 'Work in County of Residence (in state)',
             code: 'S0802_C01_067E',
-            type: 'decimal'
+            type: 'decimalPct'
          },
          {
             name: 'Work outside county of residence',
             code: 'S0802_C01_068E',
-            type: 'decimal'
+            type: 'decimalPct'
          },
          {
             name: 'Work outside state of residence',
             code: 'S0802_C01_069E',
-            type: 'decimal'
+            type: 'decimalPct'
          }
       ],
       isTrend: false,
