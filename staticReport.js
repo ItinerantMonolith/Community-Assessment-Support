@@ -1,6 +1,7 @@
 const CB_BASE_URL = 'https://api.census.gov/data/'
-const CB_DATASET_5 = '/acs/acs5?get='
-const CB_DATASET_1 = '/acs/acs1?get='
+const CB_DATASET_5 = '/acs/acs5'
+
+const CB_DATASET_1 = '/acs/acs1'
 // const CB_API_KEY =  process.env.CB_API_KEY
 CB_API_KEY = '&key=00032a8653c1b9fb53c830c4c2537cdb4e637e5f'
 const CB_STATIC_BASE = 'https://data.census.gov/cedsci/table?q='
@@ -590,6 +591,28 @@ const REPORTS_RAW = [
         }
        ],
        isTrend: false
+   },
+   {
+      name: 'Percentage of Workers (Age 16 and Over) Working in or Outside County of Residence',
+      fields: [
+         {
+            name: 'Work in County of Residence (in state)',
+            code: 'S0802_C01_067E',
+            type: 'decimal'
+         },
+         {
+            name: 'Work outside county of residence',
+            code: 'S0802_C01_068E',
+            type: 'decimal'
+         },
+         {
+            name: 'Work outside state of residence',
+            code: 'S0802_C01_069E',
+            type: 'decimal'
+         }
+      ],
+      isTrend: false,
+      reportType: 'subject'
    }
 ]
 

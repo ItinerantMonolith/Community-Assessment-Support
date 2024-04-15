@@ -18,7 +18,7 @@ const setupReportSelection = async () => {
    recentYear = new Date().getFullYear() - 1 // start with last year, by definition there can't be a report for this year available
 
    while (lookAgain) {
-      let urlPop = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}B01003_001E&for=us${CB_API_KEY}`
+      let urlPop = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=B01003_001E&for=us${CB_API_KEY}`
       try {
          let resp = await axios.get(urlPop)
          console.log(urlPop);
@@ -38,7 +38,7 @@ const setupReportSelection = async () => {
    recentYear1 = new Date().getFullYear() - 1;
    lookAgain = true;
    while (lookAgain) {
-      let urlPop = `${CB_BASE_URL}${recentYear1}${CB_DATASET_1}B01003_001E&for=us${CB_API_KEY}`
+      let urlPop = `${CB_BASE_URL}${recentYear1}${CB_DATASET_1}?get=B01003_001E&for=us${CB_API_KEY}`
       try {
          let resp = await axios.get(urlPop)
          lookAgain = false
@@ -260,7 +260,7 @@ const setupGeoFilters = () => {
 
 
 const refreshSubdivisions = async ( state, county ) => {
-   let urlZip = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=county%20subdivision:*&in=state:${state}+county:${county}${CB_API_KEY}`
+   let urlZip = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=NAME&for=county%20subdivision:*&in=state:${state}+county:${county}${CB_API_KEY}`
    try {
       let resp = await axios.get(urlZip)
       // clear the list
@@ -294,7 +294,7 @@ const refreshZips = async ( state ) => {
    else 
       zipYear = recentYear
 
-   let urlZip = `${CB_BASE_URL}${zipYear}${CB_DATASET_5}NAME&for=zip%20code%20tabulation%20area:*&in=state:${state}${CB_API_KEY}`
+   let urlZip = `${CB_BASE_URL}${zipYear}${CB_DATASET_5}?get=NAME&for=zip%20code%20tabulation%20area:*&in=state:${state}${CB_API_KEY}`
 
    try {
       let resp = await axios.get(urlZip)
@@ -323,7 +323,7 @@ const refreshZips = async ( state ) => {
 }
 
 const refreshMetroMicro = async () => {
-   let urlMetro = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area${CB_API_KEY}`
+   let urlMetro = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=NAME&for=metropolitan%20statistical%20area/micropolitan%20statistical%20area${CB_API_KEY}`
    // console.log ( urlMetro );
    try {
       let resp = await axios.get(urlMetro)
@@ -355,7 +355,7 @@ const refreshMetroMicro = async () => {
 
 
 const refreshCounties = async (state) => {
-   let urlCounty = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=county:*&in=state:${state}${CB_API_KEY}`
+   let urlCounty = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=NAME&for=county:*&in=state:${state}${CB_API_KEY}`
    // console.log ( urlCounty );
    try {
       let resp = await axios.get(urlCounty)
@@ -386,7 +386,7 @@ const refreshCounties = async (state) => {
 }
 
 const refreshPlaces = async (state) => {
-   let urlPlaces = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}NAME&for=place:*&in=state:${state}${CB_API_KEY}`
+   let urlPlaces = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=NAME&for=place:*&in=state:${state}${CB_API_KEY}`
    // console.log ( urlPlaces);
    try {
       let resp = await axios.get(urlPlaces)
@@ -513,6 +513,9 @@ class Report {
       this._name = reportDefinition.name
       this._fields = reportDefinition.fields // fields is an array of objects [ { name: 'Total Population', code: 'B01003_001E', type: 'number' }, {...}, ... ]
       this._isTrend = reportDefinition.isTrend // trend report should have only one field and will be applied to multiple years
+      this._reportType = 'base'
+      if (typeof reportDefinition.reportType !== 'undefined' )
+         this._reportType = reportDefinition.reportType;
       this._results = []
       this._resultCount = 0
       this._countyFilters = []
@@ -903,9 +906,11 @@ class Report {
       let use_dataset = CB_DATASET_5;
       if ( reportSrc === 'acs1' ) 
          use_dataset = CB_DATASET_1;
+      if ( this._reportType === 'subject' )
+         use_dataset = use_dataset + '/subject';
 
-      let myURL = `${CB_BASE_URL}${year}${use_dataset}${fieldString}${geoString}${CB_API_KEY}`
-      // console.log(myURL)
+      let myURL = `${CB_BASE_URL}${year}${use_dataset}?get=${fieldString}${geoString}${CB_API_KEY}`
+      console.log(myURL)
       try {
          let response = await axios.get(myURL)
          let respData = response.data
