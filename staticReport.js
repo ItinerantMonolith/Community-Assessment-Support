@@ -613,6 +613,17 @@ const REPORTS_RAW = [
       ],
       isTrend: false,
       reportType: 'subject'
+   },
+   {
+      name: 'Median Family Income',
+      fields: [
+         {
+            name: 'Median Family Income',
+            code: 'B19113_001E',
+            type: 'dollars'
+         }
+      ],
+      isTrend: false
    }
 ]
 

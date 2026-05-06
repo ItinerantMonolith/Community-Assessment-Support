@@ -9,6 +9,7 @@ const selectCounty = document.getElementById('selectCounty')
 // const selectCountyForSub = document.getElementById('selectCountyForSub')
 const selectCountySubdivision = document.getElementById('selectCountySubdivision')
 const chkSubdivision = document.getElementById('chkSubdivision');
+const chkCensusTract = document.getElementById('chkCensusTract');
 const selectZip = document.getElementById('selectZip');
 
 const setupReportSelection = async () => {
@@ -192,6 +193,11 @@ const setupGeoFilters = () => {
          countyList.clearList();
          refreshSubdivisions( selectState.value, selectCounty.value );
       }
+      else if ( chkCensusTract.checked ) {
+         countyList.clearList();
+         refreshCensusTracts( selectState.value, selectCounty.value );
+      }
+      
       countyList.addFilter(
          selectCounty.options[selectCounty.selectedIndex].innerText,
          selectCounty.value
@@ -204,6 +210,7 @@ const setupGeoFilters = () => {
          selectCountySubdivision.classList.remove('hideDiv');
          document.getElementById('countyList').style.display='none';
          document.getElementById('countySubList').style.display='block';
+         chkCensusTract.checked = false
       }
       else {
          selectCountySubdivision.classList.add('hideDiv');
@@ -216,6 +223,28 @@ const setupGeoFilters = () => {
             selectCounty.options[selectCounty.selectedIndex].innerText,
             selectCounty.value)
          refreshSubdivisions( selectState.value, selectCounty.value );
+      }
+   });
+      
+   chkCensusTract.addEventListener('change', () => {
+
+      if ( chkCensusTract.checked ) {
+         selectCountySubdivision.classList.remove('hideDiv');
+         document.getElementById('countyList').style.display='none';
+         document.getElementById('countySubList').style.display='block';
+         chkSubdivision.checked = false
+      }
+      else {
+         selectCountySubdivision.classList.add('hideDiv');
+         document.getElementById('countyList').style.display='block';
+         document.getElementById('countySubList').style.display='none';
+      }
+      countyList.clearList();
+      if ( selectCounty.selectedIndex != -1 ) {
+         countyList.addFilter(
+            selectCounty.options[selectCounty.selectedIndex].innerText,
+            selectCounty.value)
+         refreshCensusTracts( selectState.value, selectCounty.value );
       }
    });
 
@@ -239,7 +268,6 @@ const setupGeoFilters = () => {
    })
 
    selectMetro.addEventListener('change', () => {
-      console.log (selectMetro.options[selectMetro.selectedIndex].innerText, selectMetro.value)
       metroList.addFilter (
          selectMetro.options[selectMetro.selectedIndex].innerText, selectMetro.value
       )
@@ -287,6 +315,33 @@ const refreshSubdivisions = async ( state, county ) => {
 }
 
 
+const refreshCensusTracts = async ( state, county ) => {
+   let urlZip = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=NAME&for=tract:*&in=state:${state}+county:${county}${CB_API_KEY}`
+   try {
+      let resp = await axios.get(urlZip)
+      // clear the list
+      selectCountySubdivision.length = 0
+
+      // result will be an array with each element in the form
+      // [ name, stateID, countyID, tract ]
+      // ex: [ "Census Tract 201; Autauga County; Alabama", "01", "001", "020100" ]
+      let mySub = resp.data
+      mySub.shift() // first item returned is the header row, so remove it
+      mySub.sort((a, b) => (a[0] < b[0] ? -1 : 1))
+      mySub.forEach((e, i) => {
+         let newSub = document.createElement('option')
+         newSub.innerText = e[0].substring(0, e[0].indexOf(';'))
+         newSub.value = e[3]
+         selectCountySubdivision.add(newSub)
+      })
+   } catch (error) {
+      console.log(`Error trying to get Census Tracts. ${error}`)
+   }
+
+   selectCountySubdivision.selectedIndex = -1
+   countySubList.clearList()
+}
+
 const refreshZips = async ( state ) => {
    // 2020 and 2021 zips are not available by state, so we need a nasty little hack here for now...
    if ( recentYear > 2019 )
@@ -296,11 +351,14 @@ const refreshZips = async ( state ) => {
 
    let urlZip = `${CB_BASE_URL}${zipYear}${CB_DATASET_5}?get=NAME&for=zip%20code%20tabulation%20area:*&in=state:${state}${CB_API_KEY}`
 
+   console.log (urlZip);
+
    try {
       let resp = await axios.get(urlZip)
       // clear the list
       selectZip.length = 0
 
+      console.log ( resp.data )
       // result will be an array with each element in the form
       // [ name, stateID, countyID ]
       // ex: [ "Falls Church city, Virginia", "51", "610" ]
@@ -356,7 +414,7 @@ const refreshMetroMicro = async () => {
 
 const refreshCounties = async (state) => {
    let urlCounty = `${CB_BASE_URL}${recentYear}${CB_DATASET_5}?get=NAME&for=county:*&in=state:${state}${CB_API_KEY}`
-   // console.log ( urlCounty );
+   console.log ( urlCounty );
    try {
       let resp = await axios.get(urlCounty)
       // clear the list
@@ -520,6 +578,7 @@ class Report {
       this._resultCount = 0
       this._countyFilters = []
       this._countySubFilters = []
+      this._countyCensusTractFilters = []
       this._placeFilters = []
       this._zipFilters = []
       this._metroFilters = []
@@ -532,6 +591,8 @@ class Report {
          this._countyFilters = filters
       else if ( type === 'countySub')
          this._countySubFilters = filters
+      else if ( type === 'countyCensusTract')
+         this._countyCensusTractFilters = filters
       else if ( type === 'place' )
          this._placeFilters = filters
       else if ( type === 'zip' )
@@ -757,6 +818,9 @@ class Report {
             qry.data.forEach((e) => {
                // in this case, lets walk them using the fields.
                // first value will be the geo name
+               // let's add a simple format check...if this is a census tract, it will have a form of 'Census Tract 192.05; San Diego County; California'...so we should strip the county/state
+               if (e[0].includes('Census Tract'))
+                  e[0] = e[0].split(';')[0]
                let newArr = [e[0]]
                let fieldOffset = 0
                this._fields.forEach((field) => {
@@ -835,7 +899,6 @@ class Report {
 
       // build the header row and stick it on the front
       resultTable.unshift(this.headerRow())
-      // this.displayResults ( resultTable )
       this.displayResultsAsTable(resultTable)
    }
 
@@ -877,6 +940,12 @@ class Report {
             stateString += `+county:${this._countySubFilters[0].filterID[0]}`;
             whichFilters = this._countySubFilters.map( x => { return { 'filterID': x.filterID[1] }; } );
          } 
+         else if ( filterType === 'countyCensusTract' ) {
+            geoString += 'tract:';
+            stateString += `+county:${this._countyCensusTractFilters[0].filterID[0]}`;
+            whichFilters = this._countyCensusTractFilters.map( x => { return { 'filterID': x.filterID[1] }; } );
+         } 
+
          else if ( filterType === 'place' ) {
             geoString += 'place:'
             whichFilters = this._placeFilters;
@@ -947,10 +1016,11 @@ class Report {
       this._results = []
       this._resultCount = 0
 
-      for (let fType of ['county', 'countySub', 'place', 'zip', 'zstate', 'metro']) {
+      for (let fType of ['county', 'countySub', 'countyCensusTract', 'place', 'zip', 'zstate', 'metro']) {
          if (
             ( fType === 'county' && this._countyFilters.length ) ||
             ( fType === 'countySub' && this._countySubFilters.length ) ||
+            ( fType === 'countyCensusTract' && this._countyCensusTractFilters.length ) ||
             ( fType === 'place' && this._placeFilters.length ) ||
             ( fType === 'zip' && this._zipFilters.length ) ||
             ( fType === 'zstate' && !this._metroFilters.length ) ||
@@ -1018,7 +1088,10 @@ const generateReports = () => {
       if (zipList.hasFilters) 
          newReport.addFilters(zipList.filterList, 'zip')
       if ( countySubList.hasFilters )
-         newReport.addFilters(countySubList.filterList, 'countySub')
+         if ( chkSubdivision.checked )
+            newReport.addFilters(countySubList.filterList, 'countySub')
+         else if ( chkCensusTract.checked )
+            newReport.addFilters(countySubList.filterList, 'countyCensusTract')
       if ( metroList.hasFilters )
          newReport.addFilters(metroList.filterList, 'metro')
       
@@ -1032,6 +1105,7 @@ const generateReports = () => {
 
 const countyList = new FilterList('county', false)
 const countySubList = new FilterList('countySub', false);
+const countyCensusTractList = new FilterList('countyCensusTract', false);
 const placeList = new FilterList('place', false)
 const zipList = new FilterList('zip')
 const reportList = new FilterList('report')
