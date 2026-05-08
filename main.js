@@ -583,7 +583,7 @@ class Report {
       this._zipFilters = []
       this._metroFilters = []
       this._state = document.getElementById('selectState').value
-      this._typeSort = { 'zip': 0, 'place': 1, 'countySub': 2, 'county': 3, 'zstate': 4 };
+      this._typeSort = { 'countyCensusTract': 0, 'zip': 1, 'place': 2, 'countySub': 3, 'county': 4, 'metro': 5, 'zstate': 6 };
    }
 
    addFilters = (filters, type) => {
